@@ -60,7 +60,7 @@ This package contains the Singular development files.
 # --enable-sgroup
 #	needs sgroup directory (tarball where?)
 
-%make
+make
 perl -pi					\
 	-e 's|%{buildroot}||g;'			\
 	-e 's|--with-external-config[^ ]+||g;'	\
