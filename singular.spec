@@ -47,7 +47,9 @@ This package contains the Singular development files.
 	--includedir=%{buildroot}%{_includedir}/%{name}	\
 	--with-malloc=system				\
 	--with-gmp=%{_prefix}				\
+%ifarch %{ix86}
 	--enable-MP					\
+%endif
 	--enable-factory				\
 	--enable-libfac					\
 	--enable-Singular				\
