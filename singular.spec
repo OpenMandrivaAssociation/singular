@@ -20,6 +20,8 @@ BuildRequires:	libgmp-devel flex libncurses-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
+Patch0:		Singular-3-0-4-4-Wformat.patch
+
 %description
 SINGULAR is a Computer Algebra system for polynomial computations with
 special emphasize on the needs of commutative algebra, algebraic
@@ -47,6 +49,8 @@ This package contains the Singular static libraries.
 
 %prep
 %setup -q -n Singular-3-0-4 -a1 -a2 -a3
+
+%patch0 -p1
 
 %build
 #   There is no way, other then patching all Makefiles.in by hand
