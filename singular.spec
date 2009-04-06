@@ -1,9 +1,13 @@
+%define		name		singular
+%define		libname		%mklibname %{name} 0
+%define		devname		%mklibname %{name} -d
+%define		staticname	%mklibname %{name} -d -s
 %define		singulardir	%{_datadir}/singular
 
-Name:		singular
+Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.0.4
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-0-4/Singular-3-0-4-4.tar.gz
@@ -23,13 +27,23 @@ geometry, singularity theory and polynomial system solving. For a more
 detailed overview of SINGULAR, see
      http://www.singular.uni-kl.de/Overview/
 
-%package	devel
+%package	-n %{devname}
 Group:		Development/Other
 Summary:	Singular development files
-Requires:	%{name}
+Obsoletes:	%{name}-devel < 3.0.4-2
+Provides:	%{name}-devel = %{version}-%{release}
 
-%description	devel
+%description	-n %{devname}
 This package contains the Singular development files.
+
+%package	-n %{staticname}
+Group:		Development/Other
+Summary:	Singular static libraries
+Provides:	%{name}-devel-static = %{version}-%{release}
+Requires:	%{name}-devel
+
+%description	-n %{staticname}
+This package contains the Singular static libraries.
 
 %prep
 %setup -q -n Singular-3-0-4 -a1 -a2 -a3
@@ -44,7 +58,7 @@ This package contains the Singular development files.
 ./configure						\
 	--prefix=%{buildroot}%{_prefix}			\
 	--exec-prefix=%{buildroot}%{_prefix}		\
-	--includedir=%{buildroot}%{_includedir}/%{name}	\
+	--includedir=%{buildroot}%{_includedir}		\
 	--libdir=%{buildroot}%{_libdir}			\
 	--with-malloc=system				\
 	--with-gmp=%{_prefix}				\
@@ -77,18 +91,24 @@ perl -pi					\
 # these are not rebuilt after updating headers
 rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-0-4
 # run make once more to recompile anything dependent on the patched headers.
-make
+make all libsingular
 
 %install
-%makeinstall_std
+%makeinstall_std install-libsingular
 
 pushd %{buildroot}%{_prefix}
+  pushd %{_lib}
+    # these files are installed twice, due to the buildroot as prefix
+    # in configure, as it wants to install files during normal build...
+    rm -f dbmsr.so mpsr.so p_Procs_FieldGeneral.so	\
+	p_Procs_FieldIndep.so p_Procs_FieldQ.so p_Procs_FieldZp.so
+  popd
   mkdir -p %{buildroot}%{singulardir}/%{_arch}
   mv -f						\
 	change_cost ESingular gen_test libparse	\
 	LLL Singular-3-0-4 solve_IP		\
 	surfex toric_ideal TSingular		\
-	*.so *.sog				\
+	*.so *.sog %{_lib}/*.o			\
 	%{buildroot}%{singulardir}/%{_arch}
   rm -f LIB Singular
 
@@ -96,10 +116,18 @@ pushd %{buildroot}%{_prefix}
   mv doc/* %{buildroot}%{_docdir}/%{name}-%{version}
   rm -fr doc
   ln -sf %{_docdir}/%{name}-%{version}  %{buildroot}%{singulardir}/doc 
+
+  pushd %{buildroot}%{_includedir}
+    [ -d %{name} ] || mkdir %{name}
+    mv -f *.c *.h NTL templates %{name}
+  popd
 popd
 
 mkdir -p %{buildroot}%{_bindir}
 ln -sf %{singulardir}/%{_arch}/Singular-3-0-4 %{buildroot}%{_bindir}/Singular
+
+# installed headers are only readable by file owner...
+chmod -R a+r %{buildroot}
 
 %clean
 rm -rf %{buildroot}
@@ -123,11 +151,15 @@ rm -rf %{buildroot}
 %{singulardir}/%{_arch}/surfex
 %{singulardir}/%{_arch}/toric_ideal
 
-%files		devel
+%files		-n %{devname}
 %defattr(-,root,root)
 %{singulardir}/%{_arch}/*.so
 %{singulardir}/%{_arch}/*.sog
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*
+%{_libdir}/*.so
+
+%files		-n %{staticname}
+%defattr(-,root,root)
+%{singulardir}/%{_arch}/*.o
 %{_libdir}/*.a
-%{_libdir}/*.o
