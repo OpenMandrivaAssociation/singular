@@ -77,7 +77,7 @@ This package contains the Singular static libraries.
 # --enable-sgroup
 #	needs sgroup directory (tarball where?)
 
-make
+make CXXFLAGS="%{optflags} -fPIC"
 perl -pi					\
 	-e 's|%{buildroot}||g;'			\
 	-e 's|--with-external-config[^ ]+||g;'	\
@@ -91,7 +91,7 @@ perl -pi					\
 # these are not rebuilt after updating headers
 rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-0-4
 # run make once more to recompile anything dependent on the patched headers.
-make all libsingular
+make CXXFLAGS="%{optflags} -fPIC" all libsingular
 
 %install
 %makeinstall_std install-libsingular
