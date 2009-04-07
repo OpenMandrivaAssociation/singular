@@ -59,6 +59,7 @@ This package contains the Singular static libraries.
 #   It should be possible to build with proper --prefix, and use
 # the install-sharedist target, but it will fail before, when trying
 # to create directories in %{_prefix} during build.
+export CXXFLAGS="-fPIC"
 ./configure						\
 	--prefix=%{buildroot}%{_prefix}			\
 	--exec-prefix=%{buildroot}%{_prefix}		\
@@ -81,7 +82,7 @@ This package contains the Singular static libraries.
 # --enable-sgroup
 #	needs sgroup directory (tarball where?)
 
-make CXXFLAGS="%{optflags} -fPIC"
+make
 perl -pi					\
 	-e 's|%{buildroot}||g;'			\
 	-e 's|--with-external-config[^ ]+||g;'	\
@@ -95,7 +96,7 @@ perl -pi					\
 # these are not rebuilt after updating headers
 rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-0-4
 # run make once more to recompile anything dependent on the patched headers.
-make CXXFLAGS="%{optflags} -fPIC" all libsingular
+make all libsingular
 
 %install
 %makeinstall_std install-libsingular
