@@ -59,7 +59,8 @@ This package contains the Singular static libraries.
 #   It should be possible to build with proper --prefix, and use
 # the install-sharedist target, but it will fail before, when trying
 # to create directories in %{_prefix} during build.
-export CXXFLAGS="-fPIC"
+export CXXFLAGS="%{optflags} -fPIC"
+export CFLAGS="%{optflags} -fPIC"
 ./configure						\
 	--prefix=%{buildroot}%{_prefix}			\
 	--exec-prefix=%{buildroot}%{_prefix}		\
@@ -82,6 +83,10 @@ export CXXFLAGS="-fPIC"
 # --enable-sgroup
 #	needs sgroup directory (tarball where?)
 
+perl -pi					\
+	-e 's|(#define\s+HAVE_BOOST)|//$1|g;'	\
+	`find . -name \*.h`
+
 make
 perl -pi					\
 	-e 's|%{buildroot}||g;'			\
@@ -92,6 +97,13 @@ perl -pi					\
     Singular/mod2.h				\
     factory/factoryconf.h			\
     factory/config.h
+
+# correct compilation by default without exceptions,
+# but including c++ headers that generate exceptions
+# (/usr/include/boost/dynamic_bitset/dynamic_bitset.hpp)
+perl -i						\
+	-e 's|--no-exceptions|-fexceptions|g;'	\
+    `find . -name configure\*`
 
 # these are not rebuilt after updating headers
 rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-0-4
