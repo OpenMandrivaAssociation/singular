@@ -16,7 +16,7 @@ Source2:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-d
 Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1-0.tar.gz
 URL:		http://www.singular.uni-kl.de/
 
-BuildRequires:	libgmp-devel flex libncurses-devel
+BuildRequires:	libgmp-devel flex libncurses-devel readline-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
