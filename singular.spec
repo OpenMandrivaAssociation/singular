@@ -7,7 +7,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.0.4
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-0-4/Singular-3-0-4-4.tar.gz
@@ -142,7 +142,15 @@ pushd %{buildroot}%{_prefix}
 popd
 
 mkdir -p %{buildroot}%{_bindir}
-ln -sf %{singulardir}/%{_arch}/Singular-3-0-4 %{buildroot}%{_bindir}/Singular
+mkdir -p %{buildroot}%{singulardir}/LIB
+cp -fa Singular/LIB/*.lib %{buildroot}%{singulardir}/LIB
+mkdir -p %{buildroot}%{_bindir}
+cat > %{buildroot}%{_bindir}/Singular << EOF
+#!/bin/sh
+
+SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-0-4
+EOF
+chmod +x %{buildroot}%{_bindir}/Singular
 
 # these headers are included by installed ones, but not installed...
 mkdir -p %{buildroot}%{_includedir}/%{name}/Singular
@@ -176,6 +184,7 @@ rm -rf %{buildroot}
 %{singulardir}/%{_arch}/solve_IP
 %{singulardir}/%{_arch}/surfex
 %{singulardir}/%{_arch}/toric_ideal
+%{singulardir}/LIB
 
 %files		-n %{devname}
 %defattr(-,root,root)
