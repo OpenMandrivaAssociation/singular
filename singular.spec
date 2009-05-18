@@ -1,5 +1,4 @@
 %define		name		singular
-%define		libname		%mklibname %{name} 0
 %define		devname		%mklibname %{name} -d
 %define		staticname	%mklibname %{name} -d -s
 %define		singulardir	%{_datadir}/singular
@@ -7,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.0.4
-Release:	%mkrel 5
+Release:	%mkrel 6
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-0-4/Singular-3-0-4-4.tar.gz
@@ -42,8 +41,8 @@ This package contains the Singular development files.
 %package	-n %{staticname}
 Group:		Development/Other
 Summary:	Singular static libraries
-Provides:	%{name}-devel-static = %{version}-%{release}
-Requires:	%{name}-devel
+Provides:	%{name}-static-devel = %{version}-%{release}
+Requires:	%{name}-devel = %{version}-%{release}
 
 %description	-n %{staticname}
 This package contains the Singular static libraries.
