@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.0.4
-Release:	%mkrel 6
+Release:	%mkrel 7
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-0-4/Singular-3-0-4-4.tar.gz
@@ -16,11 +16,12 @@ Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1
 Source4:	fix-singular-includes.pl
 URL:		http://www.singular.uni-kl.de/
 
-BuildRequires:	libgmp-devel flex libncurses-devel readline-devel
+BuildRequires:	libgmp-devel ntl-devel flex libncurses-devel readline-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 Patch0:		Singular-3-0-4-4-Wformat.patch
+Patch1:		Singular-3-0-4-4-sagemath.patch
 
 %description
 SINGULAR is a Computer Algebra system for polynomial computations with
@@ -51,6 +52,7 @@ This package contains the Singular static libraries.
 %setup -q -n Singular-3-0-4 -a1 -a2 -a3
 
 %patch0 -p1
+%patch1 -p1
 
 %build
 #   There is no way, other then patching all Makefiles.in by hand
@@ -67,10 +69,14 @@ export CFLAGS="%{optflags} -fPIC"
 	--includedir=%{buildroot}%{_includedir}		\
 	--libdir=%{buildroot}%{_libdir}			\
 	--with-malloc=system				\
+	--with-apint=gmp				\
 	--with-gmp=%{_prefix}				\
-%ifarch %{ix86}
-	--enable-MP					\
-%endif
+	--with-ntl=%{_prefix}				\
+	--with-NTL					\
+	--without-MP					\
+	--without-lex					\
+	--without-bison					\
+	--without-Boost					\
 	--enable-factory				\
 	--enable-libfac					\
 	--enable-Singular				\
