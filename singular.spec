@@ -22,6 +22,7 @@ BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
 Patch0:		Singular-3-0-4-4-Wformat.patch
 Patch1:		Singular-3-0-4-4-sagemath.patch
+Patch2:		Singular-3-0-4-4-const-char.patch
 
 %description
 SINGULAR is a Computer Algebra system for polynomial computations with
@@ -53,6 +54,7 @@ This package contains the Singular static libraries.
 
 %patch0 -p1
 %patch1 -p1
+%patch2 -p1
 
 %build
 #   There is no way, other then patching all Makefiles.in by hand
