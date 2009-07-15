@@ -5,11 +5,11 @@
 
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
-Version:	3.0.4
-Release:	%mkrel 7
+Version:	3.1.0
+Release:	%mkrel 1
 License:	GPL
 Group:		Sciences/Mathematics
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-0-4/Singular-3-0-4-4.tar.gz
+Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
 Source1:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-3-1-0.tar.gz
 Source2:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-doc.tar.gz
 Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1-0.tar.gz
@@ -20,9 +20,8 @@ BuildRequires:	libgmp-devel ntl-devel flex libncurses-devel readline-devel
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
-Patch0:		Singular-3-0-4-4-Wformat.patch
-Patch1:		Singular-3-0-4-4-sagemath.patch
-Patch2:		Singular-3-0-4-4-const-char.patch
+Patch0:		Singular-3-1-0-4-sagemath.patch
+Patch1:		Singular-3-1-0-4-const-char.patch
 
 %description
 SINGULAR is a Computer Algebra system for polynomial computations with
@@ -50,11 +49,10 @@ Requires:	%{name}-devel = %{version}-%{release}
 This package contains the Singular static libraries.
 
 %prep
-%setup -q -n Singular-3-0-4 -a1 -a2 -a3
+%setup -q -n Singular-3-1-0 -a1 -a2 -a3
 
 %patch0 -p1
 %patch1 -p1
-%patch2 -p1
 
 %build
 #   There is no way, other then patching all Makefiles.in by hand
@@ -114,7 +112,7 @@ perl -i						\
     `find . -name configure\*`
 
 # these are not rebuilt after updating headers
-rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-0-4
+rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-1-0
 # run make once more to recompile anything dependent on the patched headers.
 make all libsingular
 
@@ -131,9 +129,9 @@ pushd %{buildroot}%{_prefix}
   mkdir -p %{buildroot}%{singulardir}/%{_arch}
   mv -f						\
 	change_cost ESingular gen_test libparse	\
-	LLL Singular-3-0-4 solve_IP		\
+	LLL Singular-3-1-0 solve_IP		\
 	surfex toric_ideal TSingular		\
-	*.so *.sog %{_lib}/*.o			\
+	*.so %{_lib}/*.o			\
 	%{buildroot}%{singulardir}/%{_arch}
   rm -f LIB Singular
 
@@ -155,7 +153,7 @@ mkdir -p %{buildroot}%{_bindir}
 cat > %{buildroot}%{_bindir}/Singular << EOF
 #!/bin/sh
 
-SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-0-4
+SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-0
 EOF
 chmod +x %{buildroot}%{_bindir}/Singular
 
@@ -170,6 +168,8 @@ find %{buildroot}%{_includedir} -type f -exec chmod a-x {} \;
 # correct includes
 perl %{SOURCE4}
 
+ln -s %{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}/libsingular.h
+
 %clean
 rm -rf %{buildroot}
 
@@ -183,7 +183,7 @@ rm -rf %{buildroot}
 %dir %{singulardir}/%{_arch}
 %{singulardir}/%{_arch}/ESingular
 %{singulardir}/%{_arch}/LLL
-%{singulardir}/%{_arch}/Singular-3-0-4
+%{singulardir}/%{_arch}/Singular-3-1-0
 %{singulardir}/%{_arch}/TSingular
 %{singulardir}/%{_arch}/change_cost
 %{singulardir}/%{_arch}/gen_test
@@ -196,9 +196,9 @@ rm -rf %{buildroot}
 %files		-n %{devname}
 %defattr(-,root,root)
 %{singulardir}/%{_arch}/*.so
-%{singulardir}/%{_arch}/*.sog
 %dir %{_includedir}/%{name}
 %{_includedir}/%{name}/*
+%{_includedir}/*.h
 %{_libdir}/*.so
 
 %files		-n %{staticname}
