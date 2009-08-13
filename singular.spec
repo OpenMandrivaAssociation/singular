@@ -55,7 +55,7 @@ This package contains the Singular static libraries.
 %patch1 -p1
 
 %build
-find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null
+find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
 
 #   There is no way, other then patching all Makefiles.in by hand
 # to make it respect DESTDIR ..., so build it pretending %{buildroot}
