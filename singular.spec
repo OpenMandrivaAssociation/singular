@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.0
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
@@ -55,6 +55,8 @@ This package contains the Singular static libraries.
 %patch1 -p1
 
 %build
+find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null
+
 #   There is no way, other then patching all Makefiles.in by hand
 # to make it respect DESTDIR ..., so build it pretending %{buildroot}
 # is part of prefix, and correct the few wrong usages later.
@@ -147,15 +149,21 @@ pushd %{buildroot}%{_prefix}
 popd
 
 mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{singulardir}/LIB
+mkdir -p %{buildroot}%{singulardir}/LIB/gftables
 cp -fa Singular/LIB/*.lib %{buildroot}%{singulardir}/LIB
+cp -far Singular/LIB/gftables/* %{buildroot}%{singulardir}/gftables
+cp -fa Singular/LIB/surfex/surfex.jar %{buildroot}%{singulardir}/LIB
 mkdir -p %{buildroot}%{_bindir}
 cat > %{buildroot}%{_bindir}/Singular << EOF
 #!/bin/sh
 
-SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-0
+SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-0 \$*
 EOF
 chmod +x %{buildroot}%{_bindir}/Singular
+
+perl -pi -e								\
+	's|(java -jar) (surfex.jar)|$1 %{singulardir}/LIB/$2|;'		\
+	%{buildroot}%{singulardir}/LIB/surfex
 
 # these headers are included by installed ones, but not installed...
 mkdir -p %{buildroot}%{_includedir}/%{name}/Singular
