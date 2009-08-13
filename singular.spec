@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.0
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
@@ -17,6 +17,7 @@ Source4:	fix-singular-includes.pl
 URL:		http://www.singular.uni-kl.de/
 
 BuildRequires:	libgmp-devel ntl-devel flex libncurses-devel readline-devel
+Requires:	surf
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
