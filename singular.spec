@@ -151,7 +151,7 @@ popd
 mkdir -p %{buildroot}%{_bindir}
 mkdir -p %{buildroot}%{singulardir}/LIB/gftables
 cp -fa Singular/LIB/*.lib %{buildroot}%{singulardir}/LIB
-cp -far Singular/LIB/gftables/* %{buildroot}%{singulardir}/gftables
+cp -far Singular/LIB/gftables/* %{buildroot}%{singulardir}/LIB/gftables
 cp -fa Singular/LIB/surfex/surfex.jar %{buildroot}%{singulardir}/LIB
 mkdir -p %{buildroot}%{_bindir}
 cat > %{buildroot}%{_bindir}/Singular << EOF
