@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.0
-Release:	%mkrel 4
+Release:	%mkrel 5
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
@@ -179,6 +179,9 @@ perl %{SOURCE4}
 
 ln -s %{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}/libsingular.h
 
+# move conflicting static files to archdir
+mv -f %{buildroot}%{_libdir}/*.a %{singulardir}/%{_arch}
+
 %clean
 rm -rf %{buildroot}
 
@@ -213,4 +216,4 @@ rm -rf %{buildroot}
 %files		-n %{staticname}
 %defattr(-,root,root)
 %{singulardir}/%{_arch}/*.o
-%{_libdir}/*.a
+%{singulardir}/%{_arch}/*.a
