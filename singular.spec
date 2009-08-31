@@ -180,7 +180,7 @@ perl %{SOURCE4}
 ln -s %{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}/libsingular.h
 
 # move conflicting static files to archdir
-mv -f %{buildroot}%{_libdir}/*.a %{singulardir}/%{_arch}
+mv -f %{buildroot}%{_libdir}/*.a %{buildroot}%{singulardir}/%{_arch}
 
 %clean
 rm -rf %{buildroot}
