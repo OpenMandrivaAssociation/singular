@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.0
-Release:	%mkrel 5
+Release:	%mkrel 6
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
@@ -161,6 +161,7 @@ cat > %{buildroot}%{_bindir}/Singular << EOF
 SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-0 \$*
 EOF
 chmod +x %{buildroot}%{_bindir}/Singular
+ln -sf %{_bindir}/Singular %{buildroot}%{_bindir}/singular
 
 perl -pi -e								\
 	's|(java -jar) (surfex.jar)|$1 %{singulardir}/LIB/$2|;'		\
@@ -188,6 +189,7 @@ rm -rf %{buildroot}
 %files
 %defattr(-,root,root)
 %{_bindir}/Singular
+%{_bindir}/singular
 %doc %dir %{_docdir}/%{name}-%{version}
 %doc %{_docdir}/%{name}-%{version}/*
 %dir %{singulardir}
