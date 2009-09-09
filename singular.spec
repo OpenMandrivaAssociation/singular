@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.0
-Release:	%mkrel 6
+Release:	%mkrel 7
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
@@ -75,7 +75,7 @@ export CFLAGS="%{optflags} -fPIC"
 	--with-apint=gmp				\
 	--with-gmp=%{_prefix}				\
 	--with-ntl=%{_prefix}				\
-	--with-NTL					\
+	--disable-NTL					\
 	--without-MP					\
 	--without-lex					\
 	--without-bison					\
@@ -138,14 +138,9 @@ pushd %{buildroot}%{_prefix}
 	%{buildroot}%{singulardir}/%{_arch}
   rm -f LIB Singular
 
-  mkdir -p %{buildroot}%{_docdir}/%{name}-%{version}
-  mv doc/* %{buildroot}%{_docdir}/%{name}-%{version}
-  rm -fr doc
-  ln -sf %{_docdir}/%{name}-%{version}  %{buildroot}%{singulardir}/doc 
-
   pushd %{buildroot}%{_includedir}
     [ -d %{name} ] || mkdir %{name}
-    mv -f *.c *.h NTL templates %{name}
+    mv -f *.c *.h templates %{name}
   popd
 popd
 
@@ -190,10 +185,7 @@ rm -rf %{buildroot}
 %defattr(-,root,root)
 %{_bindir}/Singular
 %{_bindir}/singular
-%doc %dir %{_docdir}/%{name}-%{version}
-%doc %{_docdir}/%{name}-%{version}/*
 %dir %{singulardir}
-%{singulardir}/doc
 %dir %{singulardir}/%{_arch}
 %{singulardir}/%{_arch}/ESingular
 %{singulardir}/%{_arch}/LLL
