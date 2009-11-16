@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.0
-Release:	%mkrel 7
+Release:	%mkrel 8
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
@@ -166,14 +166,18 @@ perl -pi -e								\
 mkdir -p %{buildroot}%{_includedir}/%{name}/Singular
 cp -fa Singular/*.h %{buildroot}%{_includedir}/%{name}/Singular
 
-# installed headers are only readable by file owner...
-chmod -R a+r %{buildroot}
-find %{buildroot}%{_includedir} -type f -exec chmod a-x {} \;
-
 # correct includes
 perl %{SOURCE4}
 
-ln -s %{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}/libsingular.h
+# keep only libsingular.h outside %{_includedir}/%{name}
+mv %{buildroot}%{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}
+# files required during sagemath build, and/or side effect of sagemath patch
+cp kernel/kInline.cc %{buildroot}%{_includedir}/%{name}
+cp Singular/{grammar,ipid,ipshell,subexpr,tok}.h  %{buildroot}%{_includedir}/%{name}
+
+# installed headers are only readable by file owner...
+chmod -R a+r %{buildroot}
+find %{buildroot}%{_includedir} -type f -exec chmod a-x {} \;
 
 # move conflicting static files to archdir
 mv -f %{buildroot}%{_libdir}/*.a %{buildroot}%{singulardir}/%{_arch}
