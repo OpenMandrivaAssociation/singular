@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.0
-Release:	%mkrel 8
+Release:	%mkrel 9
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
@@ -14,6 +14,8 @@ Source1:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-3
 Source2:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-doc.tar.gz
 Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1-0.tar.gz
 Source4:	fix-singular-includes.pl
+Source5:	singular.hlp
+Source6:	singular.idx
 URL:		http://www.singular.uni-kl.de/
 
 BuildRequires:	libgmp-devel ntl-devel flex libncurses-devel readline-devel
@@ -66,6 +68,9 @@ find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
 # to create directories in %{_prefix} during build.
 export CXXFLAGS="%{optflags} -fPIC"
 export CFLAGS="%{optflags} -fPIC"
+
+# Should be possible to build with s/--without-MP/--enable-MP/
+# but MP configure fails due to sizeof(long) != 4 on x86_64
 ./configure						\
 	--prefix=%{buildroot}%{_prefix}			\
 	--exec-prefix=%{buildroot}%{_prefix}		\
@@ -97,6 +102,12 @@ perl -pi					\
 	`find . -name \*.h`
 
 make
+
+# need MP to build doc or will lock on failed tcp connection
+#pushd doc
+#    make SINGULAR=%{buildroot}%{singulardir}/%{arch}/Singular-3-1-0 all
+#popd
+
 perl -pi					\
 	-e 's|%{buildroot}||g;'			\
 	-e 's|--with-external-config[^ ]+||g;'	\
@@ -182,6 +193,8 @@ find %{buildroot}%{_includedir} -type f -exec chmod a-x {} \;
 # move conflicting static files to archdir
 mv -f %{buildroot}%{_libdir}/*.a %{buildroot}%{singulardir}/%{_arch}
 
+cp %{SOURCE5} %{SOURCE6} %{buildroot}%{singulardir}
+
 %clean
 rm -rf %{buildroot}
 
@@ -202,6 +215,7 @@ rm -rf %{buildroot}
 %{singulardir}/%{_arch}/surfex
 %{singulardir}/%{_arch}/toric_ideal
 %{singulardir}/LIB
+%{singulardir}/singular.*
 
 %files		-n %{devname}
 %defattr(-,root,root)
