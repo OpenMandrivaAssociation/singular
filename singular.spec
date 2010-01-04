@@ -184,7 +184,7 @@ perl %{SOURCE4}
 mv %{buildroot}%{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}
 # files required during sagemath build, and/or side effect of sagemath patch
 cp kernel/kInline.cc %{buildroot}%{_includedir}/%{name}
-cp Singular/{grammar,ipid,ipshell,lists.h,subexpr,tok}.h  %{buildroot}%{_includedir}/%{name}
+cp Singular/{grammar,ipid,ipshell,lists,subexpr,tok}.h  %{buildroot}%{_includedir}/%{name}
 
 # installed headers are only readable by file owner...
 chmod -R a+r %{buildroot}
