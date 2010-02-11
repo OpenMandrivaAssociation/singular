@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.0
-Release:	%mkrel 13
+Release:	%mkrel 14
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
@@ -184,7 +184,7 @@ perl %{SOURCE4}
 mv %{buildroot}%{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}
 # files required during sagemath build, and/or side effect of sagemath patch
 cp kernel/kInline.cc %{buildroot}%{_includedir}/%{name}
-cp Singular/{grammar,ipid,ipshell,lists,subexpr,tok}.h  %{buildroot}%{_includedir}/%{name}
+cp Singular/{attrib,grammar,ipid,ipshell,lists,subexpr,tok}.h  %{buildroot}%{_includedir}/%{name}
 
 # installed headers are only readable by file owner...
 chmod -R a+r %{buildroot}
