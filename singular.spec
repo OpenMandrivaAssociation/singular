@@ -49,7 +49,8 @@ Requires:	%{name}-devel = %{version}-%{release}
 This package contains the Singular static libraries.
 
 %prep
-%setup -q -n Singular-3-1-1 -a1 -a2 -a3
+#%#setup -q -n Singular-3-1-1 -a1 -a2 -a3
+%setup -q -n Singular-3-1-1
 
 %build
 find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
