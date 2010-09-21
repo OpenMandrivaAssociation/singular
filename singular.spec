@@ -5,14 +5,14 @@
 
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
-Version:	3.1.0
-Release:	%mkrel 14
+Version:	3.1.1
+Release:	%mkrel 1
 License:	GPL
 Group:		Sciences/Mathematics
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-0/Singular-3-1-0-4.tar.gz
-Source1:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-3-1-0.tar.gz
+Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-1/Singular-3-1-1-4.tar.gz
+Source1:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-3-1-1.tar.gz
 Source2:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-doc.tar.gz
-Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1-0.tar.gz
+Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1-1.tar.gz
 Source4:	fix-singular-includes.pl
 Source5:	singular.hlp
 Source6:	singular.idx
@@ -22,9 +22,6 @@ BuildRequires:	libgmp-devel ntl-devel flex libncurses-devel readline-devel
 Requires:	surf
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
-
-Patch0:		Singular-3-1-0-4-sagemath.patch
-Patch1:		Singular-3-1-0-4-const-char.patch
 
 %description
 SINGULAR is a Computer Algebra system for polynomial computations with
@@ -52,10 +49,7 @@ Requires:	%{name}-devel = %{version}-%{release}
 This package contains the Singular static libraries.
 
 %prep
-%setup -q -n Singular-3-1-0 -a1 -a2 -a3
-
-%patch0 -p1
-%patch1 -p1
+%setup -q -n Singular-3-1-1 -a1 -a2 -a3
 
 %build
 find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
@@ -69,8 +63,6 @@ find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
 export CXXFLAGS="%{optflags} -fPIC"
 export CFLAGS="%{optflags} -fPIC"
 
-# Should be possible to build with s/--without-MP/--enable-MP/
-# but MP configure fails due to sizeof(long) != 4 on x86_64
 ./configure						\
 	--prefix=%{buildroot}%{_prefix}			\
 	--exec-prefix=%{buildroot}%{_prefix}		\
@@ -105,7 +97,7 @@ make
 
 # need MP to build doc or will lock on failed tcp connection
 #pushd doc
-#    make SINGULAR=%{buildroot}%{singulardir}/%{arch}/Singular-3-1-0 all
+#    make SINGULAR=%{buildroot}%{singulardir}/%{arch}/Singular-3-1-1 all
 #popd
 
 perl -pi					\
@@ -126,7 +118,7 @@ perl -i						\
     `find . -name configure\*`
 
 # these are not rebuilt after updating headers
-rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-1-0
+rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-1-1
 # run make once more to recompile anything dependent on the patched headers.
 make all libsingular
 
@@ -143,7 +135,7 @@ pushd %{buildroot}%{_prefix}
   mkdir -p %{buildroot}%{singulardir}/%{_arch}
   mv -f						\
 	change_cost ESingular gen_test libparse	\
-	LLL Singular-3-1-0 solve_IP		\
+	LLL Singular-3-1-1 solve_IP		\
 	surfex toric_ideal TSingular		\
 	*.so %{_lib}/*.o			\
 	%{buildroot}%{singulardir}/%{_arch}
@@ -164,7 +156,7 @@ mkdir -p %{buildroot}%{_bindir}
 cat > %{buildroot}%{_bindir}/Singular << EOF
 #!/bin/sh
 
-SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-0 \$*
+SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-1 \$*
 EOF
 chmod +x %{buildroot}%{_bindir}/Singular
 ln -sf %{_bindir}/Singular %{buildroot}%{_bindir}/singular
@@ -206,7 +198,7 @@ rm -rf %{buildroot}
 %dir %{singulardir}/%{_arch}
 %{singulardir}/%{_arch}/ESingular
 %{singulardir}/%{_arch}/LLL
-%{singulardir}/%{_arch}/Singular-3-1-0
+%{singulardir}/%{_arch}/Singular-3-1-1
 %{singulardir}/%{_arch}/TSingular
 %{singulardir}/%{_arch}/change_cost
 %{singulardir}/%{_arch}/gen_test
