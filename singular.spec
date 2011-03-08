@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.1
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-1/Singular-3-1-1-4.tar.gz
@@ -73,7 +73,7 @@ export CFLAGS="%{optflags} -fPIC"
 	--with-apint=gmp				\
 	--with-gmp=%{_prefix}				\
 	--with-ntl=%{_prefix}				\
-	--disable-NTL					\
+	--with-NTL					\
 	--without-MP					\
 	--without-lex					\
 	--without-bison					\
@@ -82,13 +82,10 @@ export CFLAGS="%{optflags} -fPIC"
 	--enable-libfac					\
 	--enable-Singular				\
 	--enable-IntegerProgramming			\
-	--enable-Plural					\
 	--enable-Texinfo				\
 	--enable-Texi2html				\
 	--enable-doc					\
 	--enable-emacs
-# --enable-sgroup
-#	needs sgroup directory (tarball where?)
 
 perl -pi					\
 	-e 's|(#define\s+HAVE_BOOST)|//$1|g;'	\
@@ -187,6 +184,8 @@ find %{buildroot}%{_includedir} -type f -exec chmod a-x {} \;
 mv -f %{buildroot}%{_libdir}/*.a %{buildroot}%{singulardir}/%{_arch}
 
 cp %{SOURCE5} %{SOURCE6} %{buildroot}%{singulardir}
+
+rm -fr %{buildroot}%{_includedir}/NTL
 
 %clean
 rm -rf %{buildroot}
