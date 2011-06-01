@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.1
-Release:	%mkrel 3
+Release:	%mkrel 4
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-1/Singular-3-1-1-4.tar.gz
@@ -63,6 +63,9 @@ find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
 # to create directories in %{_prefix} during build.
 export CXXFLAGS="%{optflags} -fPIC"
 export CFLAGS="%{optflags} -fPIC"
+
+#   Must use system ntl
+rm -fr ntl
 
 ./configure						\
 	--prefix=%{buildroot}%{_prefix}			\
