@@ -174,10 +174,14 @@ cp -fa Singular/*.h %{buildroot}%{_includedir}/%{name}/Singular
 perl %{SOURCE4}
 
 # correct wrong path
-perl -pi -e 's|(#\s*include <)factory/|$1|;'			\
+perl -pi -e 's:(#\s*include <)(factory|kernel|omalloc)/:$1:;'	\
 	%{buildroot}%{_includedir}/%{name}/*.h			\
+	%{buildroot}%{_includedir}/%{name}/*.cc			\
+	%{buildroot}%{_includedir}/%{name}/Singular/*.h		\
 	%{buildroot}%{_includedir}/%{name}/templates/*.h	\
 	%{buildroot}%{_includedir}/%{name}/templates/*.cc
+perl -pi -e 's:(#\s*include")kernel/:$1:;'			\
+	%{buildroot}%{_includedir}/%{name}/Singular/*.h
 
 # keep only libsingular.h outside %{_includedir}/%{name}
 mv %{buildroot}%{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}
