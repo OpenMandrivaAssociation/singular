@@ -5,14 +5,14 @@
 
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
-Version:	3.1.1
-Release:	%mkrel 4
+Version:	3.1.3
+Release:	%mkrel 1
 License:	GPL
 Group:		Sciences/Mathematics
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-1/Singular-3-1-1-4.tar.gz
-Source1:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-3-1-1.tar.gz
+Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-3/Singular-3-1-3-3.tar.gz
+Source1:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-3-1-3.tar.gz
 Source2:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-doc.tar.gz
-Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1-1.tar.gz
+Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1-3.tar.gz
 Source4:	fix-singular-includes.pl
 Source5:	singular.hlp
 Source6:	singular.idx
@@ -49,8 +49,7 @@ Requires:	%{name}-devel = %{version}-%{release}
 This package contains the Singular static libraries.
 
 %prep
-#%#setup -q -n Singular-3-1-1 -a1 -a2 -a3
-%setup -q -n Singular-3-1-1
+%setup -q -n Singular-3-1-3
 
 %build
 find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
@@ -98,7 +97,7 @@ make
 
 # need MP to build doc or will lock on failed tcp connection
 #pushd doc
-#    make SINGULAR=%{buildroot}%{singulardir}/%{arch}/Singular-3-1-1 all
+#    make SINGULAR=%{buildroot}%{singulardir}/%{arch}/Singular-3-1-3 all
 #popd
 
 perl -pi					\
@@ -119,9 +118,7 @@ perl -i						\
     `find . -name configure\*`
 
 # these are not rebuilt after updating headers
-rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-1-1
-# run make once more to recompile anything dependent on the patched headers.
-make all libsingular
+rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-1-3
 
 %install
 %makeinstall_std install-libsingular
@@ -136,7 +133,7 @@ pushd %{buildroot}%{_prefix}
   mkdir -p %{buildroot}%{singulardir}/%{_arch}
   mv -f						\
 	change_cost ESingular gen_test libparse	\
-	LLL Singular-3-1-1 solve_IP		\
+	LLL Singular-3-1-3 solve_IP		\
 	surfex toric_ideal TSingular		\
 	*.so %{_lib}/*.o			\
 	%{buildroot}%{singulardir}/%{_arch}
@@ -144,7 +141,7 @@ pushd %{buildroot}%{_prefix}
 
   pushd %{buildroot}%{_includedir}
     [ -d %{name} ] || mkdir %{name}
-    mv -f *.c *.h templates %{name}
+    mv -f *.h templates %{name}
   popd
 popd
 
@@ -157,7 +154,7 @@ mkdir -p %{buildroot}%{_bindir}
 cat > %{buildroot}%{_bindir}/Singular << EOF
 #!/bin/sh
 
-SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-1 \$*
+SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-3 \$*
 EOF
 chmod +x %{buildroot}%{_bindir}/Singular
 ln -sf %{_bindir}/Singular %{buildroot}%{_bindir}/singular
@@ -201,7 +198,7 @@ rm -rf %{buildroot}
 %dir %{singulardir}/%{_arch}
 %{singulardir}/%{_arch}/ESingular
 %{singulardir}/%{_arch}/LLL
-%{singulardir}/%{_arch}/Singular-3-1-1
+%{singulardir}/%{_arch}/Singular-3-1-3
 %{singulardir}/%{_arch}/TSingular
 %{singulardir}/%{_arch}/change_cost
 %{singulardir}/%{_arch}/gen_test
