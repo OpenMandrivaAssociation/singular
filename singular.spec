@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.3
-Release:	%mkrel 1
+Release:	%mkrel 2
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-3/Singular-3-1-3-3.tar.gz
@@ -50,6 +50,9 @@ This package contains the Singular static libraries.
 
 %prep
 %setup -q -n Singular-3-1-3
+
+perl -pi -e 's|(#define GFTABLEDIR ")/usr/share/factory/gftables"|$1/usr/share/singular/LIB/gftables"|'	\
+    factory/factoryconf.h
 
 %build
 find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
@@ -169,6 +172,12 @@ cp -fa Singular/*.h %{buildroot}%{_includedir}/%{name}/Singular
 
 # correct includes
 perl %{SOURCE4}
+
+# correct wrong path
+perl -pi -e 's|(#\s*include <)factory/|$1|;'			\
+	%{buildroot}%{_includedir}/%{name}/*.h			\
+	%{buildroot}%{_includedir}/%{name}/templates/*.h	\
+	%{buildroot}%{_includedir}/%{name}/templates/*.cc
 
 # keep only libsingular.h outside %{_includedir}/%{name}
 mv %{buildroot}%{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}
