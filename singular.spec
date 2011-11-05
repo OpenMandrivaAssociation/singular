@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.3
-Release:	%mkrel 2
+Release:	%mkrel 3
 License:	GPL
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-3/Singular-3-1-3-3.tar.gz
@@ -173,16 +173,6 @@ cp -fa Singular/*.h %{buildroot}%{_includedir}/%{name}/Singular
 # correct includes
 perl %{SOURCE4}
 
-# correct wrong path
-perl -pi -e 's:(#\s*include <)(factory|kernel|omalloc)/:$1:;'	\
-	%{buildroot}%{_includedir}/%{name}/*.h			\
-	%{buildroot}%{_includedir}/%{name}/*.cc			\
-	%{buildroot}%{_includedir}/%{name}/Singular/*.h		\
-	%{buildroot}%{_includedir}/%{name}/templates/*.h	\
-	%{buildroot}%{_includedir}/%{name}/templates/*.cc
-perl -pi -e 's:(#\s*include")kernel/:$1:;'			\
-	%{buildroot}%{_includedir}/%{name}/Singular/*.h
-
 # keep only libsingular.h outside %{_includedir}/%{name}
 mv %{buildroot}%{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}
 # files required during sagemath build, and/or side effect of sagemath patch
@@ -199,6 +189,25 @@ mv -f %{buildroot}%{_libdir}/*.a %{buildroot}%{singulardir}/%{_arch}
 cp %{SOURCE5} %{SOURCE6} %{buildroot}%{singulardir}
 
 rm -fr %{buildroot}%{_includedir}/NTL
+
+# correct wrong path
+perl -pi -e 's:(#\s*include <)(factory|kernel|omalloc)/:$1:;'	\
+	%{buildroot}%{_includedir}/%{name}/*.h			\
+	%{buildroot}%{_includedir}/%{name}/*.cc			\
+	%{buildroot}%{_includedir}/%{name}/Singular/*.h		\
+	%{buildroot}%{_includedir}/%{name}/templates/*.h	\
+	%{buildroot}%{_includedir}/%{name}/templates/*.cc
+perl -pi -e 's:(#\s*include")kernel/:$1:;'			\
+	%{buildroot}%{_includedir}/%{name}/Singular/*.h
+
+# (ugly) hack to have mmInit defined to a stub in libsingular.so
+pushd Singular
+    rm -f libsingular.so
+    rm -f misc_ip.o
+    make CXXFLAGS="%{optflags} -fPIC -DLIBSINGULAR -DHAVE_FACTORY -I../omalloc" \
+	LIBSINGULAR_FLAGS="-shared -L../omalloc" libsingular
+    cp -f libsingular.so %{buildroot}%{_libdir}
+popd
 
 %clean
 rm -rf %{buildroot}
