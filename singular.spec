@@ -1,245 +1,400 @@
-%define		name		singular
-%define		devname		%mklibname %{name} -d
-%define		staticname	%mklibname %{name} -d -s
-%define		singulardir	%{_datadir}/singular
+%define		name			singular
+%define		old_libsingular_devel	%mklibname %{name} -d
+%define		old_libsingular_static	%mklibname %{name} -d -s
+%define		singulardir		%{_libdir}/Singular
 
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
-Version:	3.1.3
-Release:	%mkrel 3
-License:	GPL
+Version:	3.1.5
+Release:	1
+License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-3/Singular-3-1-3-3.tar.gz
-Source1:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-3-1-3.tar.gz
-Source2:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Factory/factory-doc.tar.gz
-Source3:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/Libfac/libfac-3-1-3.tar.gz
-Source4:	fix-singular-includes.pl
-Source5:	singular.hlp
-Source6:	singular.idx
+Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-5/Singular-3-1-5.tar.gz
+Source1:	singular.hlp
+Source2:	singular.idx
 URL:		http://www.singular.uni-kl.de/
-
-BuildRequires:	libgmp-devel ntl-devel flex libncurses-devel readline-devel
+BuildRequires:	emacs
+BuildRequires:	flex
+BuildRequires:	gmp-devel
+BuildRequires:	ncurses-devel
+BuildRequires:	ntl-devel
+BuildRequires:	readline-devel
+BuildRequires:	sharutils
+BuildRequires:	texinfo
+BuildRequires:	texlive
 Requires:	surf
 
-BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
+# Use destdir in install targets
+Patch1:		Singular-destdir.patch
+# Find headers in source tree
+Patch2:		Singular-headers.patch
+# Find and link to generated libraries
+Patch3:		Singular-link.patch
+# Do not attempt to load non existing modules, do not even run
+# the binary in DESTDIR when building the documentation
+Patch4:		Singular-doc.patch
+# Correct koji error:
+# ** ERROR: No build ID note found in /builddir/build/BUILDROOT/Singular-3.1.3-1.fc16.x86_64/usr/lib64/Singular/dbmsr.so
+Patch5:		Singular-builddid.patch
+# Correct undefined symbol in libsingular
+# This patch removes a hack to avoid duplicated symbols in tesths.cc
+# when calling mp_set_memory_functions, what is a really a bad idea on
+# a shared library.
+Patch6:		Singular-undefined.patch
+
+# From sagemath singular-3-1-5.p0.spkg in "Upgrade Singular" trac
+# at http://trac.sagemath.org/sage_trac/ticket/13237
+Patch7:		NTL_negate.patch
+Patch8:		singular_trac_439.patch
+Patch9:		singular_trac_440.patch
+Patch10:	singular_trac_441.patch
+
+## Macaulay2 patches
+Patch20: Singular-M2_factory.patch
+Patch21: Singular-M2_memutil_debuggging.patch
+Patch22: Singular-M2_libfac.patch
 
 %description
-SINGULAR is a Computer Algebra system for polynomial computations with
-special emphasize on the needs of commutative algebra, algebraic
-geometry, singularity theory and polynomial system solving. For a more
-detailed overview of SINGULAR, see
-     http://www.singular.uni-kl.de/Overview/
+Singular is a computer algebra system for polynomial computations, with
+special emphasis on commutative and non-commutative algebra, algebraic
+geometry, and singularity theory. It is free and open-source under the
+GNU General Public Licence.
 
-%package	-n %{devname}
+%package	devel
 Group:		Development/Other
 Summary:	Singular development files
-Obsoletes:	%{name}-devel < 3.0.4-2
-Provides:	%{name}-devel = %{version}-%{release}
+Obsoletes:	%{old_libsingular_devel} < %{version}-%{release}
+Obsoletes:	%{old_libsingular_static} < %{version}-%{release}
+Provides:	%{old_libsingular_devel} = %{version}-%{release}
 
-%description	-n %{devname}
+%description	devel
 This package contains the Singular development files.
 
-%package	-n %{staticname}
+%package	-n factory-devel
+Summary:	C++ class library for multivariate polynomial data
 Group:		Development/Other
-Summary:	Singular static libraries
-Provides:	%{name}-static-devel = %{version}-%{release}
-Requires:	%{name}-devel = %{version}-%{release}
+Requires:	gmp-devel
+Obsoletes:	factory-static < %{version}-%{release}
+Provides:	factory-static = %{version}-%{release}
 
-%description	-n %{staticname}
-This package contains the Singular static libraries.
+%description	-n factory-devel 
+Factory is a C++ class library that implements a recursive representation
+of multivariate polynomial data.
+
+%package	-n libfac-devel
+Summary:	An extension to Singular-factory
+Group:		Development/Other
+Obsoletes:	libfac-static < %{version}-%{release}
+Provides:	libfac-static = %{version}-%{release}
+
+%description	-n libfac-devel
+Singular-libfac is an extension to Singular-factory which implements
+factorization of polynomials over finite fields and algorithms for
+manipulation of polynomial ideals via the characteristic set methods
+(e.g., calculating the characteristic set and the irreducible
+characteristic series).
+
+%package	examples
+Summary:	Singular example files
+Group:		Sciences/Mathematics
+Requires:	%{name} = %{version}-%{release}
+
+%description	examples
+This package contains the Singular example files.
+
+%package	doc
+Summary:	Singular documentation files
+Group:		Sciences/Mathematics
+Requires:	%{name} = %{version}-%{release}
+
+%description	doc
+This package contains the Singular documentation files.
+
+%package	surfex
+Summary:	Singular java interface
+Group:		Sciences/Mathematics
+Requires:	java
+Requires:	%{name} = %{version}-%{release}
+
+%description	surfex
+This package contains the Singular java interface.
+
+%package	emacs
+Summary:	Emacs mode for Singular
+Group:		Sciences/Mathematics
+Requires:	emacs-common
+Requires:	%{name} = %{version}-%{release}
+
+%description	emacs
+Emacs mode for Singular.
 
 %prep
-%setup -q -n Singular-3-1-3
+%setup -q -n Singular-3-1-5
+%patch1 -p1
+%patch2 -p1
+%patch3 -p1
+%patch4 -p1
+%patch5 -p1
+%patch6 -p1
 
-perl -pi -e 's|(#define GFTABLEDIR ")/usr/share/factory/gftables"|$1/usr/share/singular/LIB/gftables"|'	\
-    factory/factoryconf.h
+%patch7 -p1
+%patch8 -p1
+%patch9 -p1
+%patch10 -p1
 
-%build
-find . -type d -name CVS -exec rm -fr {} \; 2> /dev/null || :
+%patch20 -p1 -b .M2_factory
+%patch21 -p1 -b .M2_memutil_debuggging
+%patch22 -p1 -b .M2_libfac
 
-#   There is no way, other then patching all Makefiles.in by hand
-# to make it respect DESTDIR ..., so build it pretending %{buildroot}
-# is part of prefix, and correct the few wrong usages later.
-#   It should be possible to build with proper --prefix, and use
-# the install-sharedist target, but it will fail before, when trying
-# to create directories in %{_prefix} during build.
-export CXXFLAGS="%{optflags} -fPIC"
-export CFLAGS="%{optflags} -fPIC"
+sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
+    -e "s|explicit_gftabledir=.*|explicit_gftabledir='%{singulardir}/LIB/gftables'|" \
+    factory/configure.in
 
-#   Must use system ntl
+# Force use of system ntl
 rm -fr ntl
 
-./configure						\
-	--prefix=%{buildroot}%{_prefix}			\
-	--exec-prefix=%{buildroot}%{_prefix}		\
-	--includedir=%{buildroot}%{_includedir}		\
-	--libdir=%{buildroot}%{_libdir}			\
-	--with-malloc=system				\
-	--with-apint=gmp				\
-	--with-gmp=%{_prefix}				\
-	--with-ntl=%{_prefix}				\
-	--with-NTL					\
-	--without-MP					\
-	--without-lex					\
-	--without-bison					\
-	--without-Boost					\
-	--enable-factory				\
-	--enable-libfac					\
-	--enable-Singular				\
-	--enable-IntegerProgramming			\
-	--enable-Texinfo				\
-	--enable-Texi2html				\
-	--enable-doc					\
-	--enable-emacs
+%build
+export CFLAGS="%{optflags} -fPIC"
+export CXXFLAGS=$CFLAGS
 
-perl -pi					\
-	-e 's|(#define\s+HAVE_BOOST)|//$1|g;'	\
-	`find . -name \*.h`
+# build components in specific order to not need to build & install
+# in a single make command
+%configure \
+	--bindir=%{singulardir} \
+	--with-apint=gmp \
+	--with-gmp=%{_prefix} \
+	--with-ntl=%{_prefix} \
+	--with-NTL \
+	--without-MP \
+	--without-lex \
+	--without-bison \
+	--without-Boost \
+	--enable-gmp=%{_prefix} \
+	--enable-Singular \
+	--enable-factory \
+	--enable-libfac \
+	--enable-IntegerProgramming \
+	--disable-doc \
+	--with-malloc=system
+# remove bogus -L/usr/kernel from linker command line and
+# do not put standard library in linker command line to avoid
+# linking with a system wide libsingcf or libfacf
+sed -i 's|-L%{_prefix}/kernel||g;s|-L%{_libdir}||g' Singular/Makefile
+make %{?_smp_mflags} Singular
+# factory needs omalloc built
+make %{?_smp_mflags} -C omalloc
 
-make
+pushd factory
+%configure \
+	--bindir=%{singulardir} \
+	--includedir=%{_includedir}/factory \
+	--with-apint=gmp \
+	--with-gmp=%{_prefix} \
+	--with-ntl=%{_prefix} \
+	--with-NTL \
+	--with-Singular \
+	--enable-gmp=%{_prefix}
+    make %{?_smp_mflags}
+popd
 
-# need MP to build doc or will lock on failed tcp connection
-#pushd doc
-#    make SINGULAR=%{buildroot}%{singulardir}/%{arch}/Singular-3-1-3 all
-#popd
+# kernel needs factory built
+make %{?_smp_mflags} -C kernel
 
-perl -pi					\
-	-e 's|%{buildroot}||g;'			\
-	-e 's|--with-external-config[^ ]+||g;'	\
-	-e "s|\s*--cache-file[^']+||;"		\
-	-e 's|in %{builddir}[^"]+||g;'		\
-    kernel/mod2.h				\
-    Singular/mod2.h				\
-    factory/factoryconf.h			\
-    factory/config.h
+# libfac needs factory built
+pushd libfac
+%configure \
+	--bindir=%{singulardir} \
+	--with-apint=gmp \
+	--with-gmp=%{_prefix} \
+	--with-ntl=%{_prefix} \
+	--with-NTL \
+	--enable-factory \
+	--enable-libfac \
+	--enable-omalloc \
+	--enable-gmp=%{_prefix}
+    make %{?_smp_mflags}
+    # not built by default
+    make libfac.a
+popd
 
-# correct compilation by default without exceptions,
-# but including c++ headers that generate exceptions
-# (/usr/include/boost/dynamic_bitset/dynamic_bitset.hpp)
-perl -i						\
-	-e 's|--no-exceptions|-fexceptions|g;'	\
-    `find . -name configure\*`
-
-# these are not rebuilt after updating headers
-rm -f Singular/Singular %{buildroot}%{_prefix}/Singular-3-1-3
+# target required to rebuild documentation
+make %{?_smp_mflags} -C Singular libparse
 
 %install
-%makeinstall_std install-libsingular
+make \
+	DESTDIR=$RPM_BUILD_ROOT \
+	install_prefix=$RPM_BUILD_ROOT%{singulardir} \
+	slibdir=%{singulardir}/LIB \
+	install \
+	install-libsingular \
+	install-sharedist
 
-pushd %{buildroot}%{_prefix}
-  pushd %{_lib}
-    # these files are installed twice, due to the buildroot as prefix
-    # in configure, as it wants to install files during normal build...
-    rm -f dbmsr.so mpsr.so p_Procs_FieldGeneral.so	\
-	p_Procs_FieldIndep.so p_Procs_FieldQ.so p_Procs_FieldZp.so
-  popd
-  mkdir -p %{buildroot}%{singulardir}/%{_arch}
-  mv -f						\
-	change_cost ESingular gen_test libparse	\
-	LLL Singular-3-1-3 solve_IP		\
-	surfex toric_ideal TSingular		\
-	*.so %{_lib}/*.o			\
-	%{buildroot}%{singulardir}/%{_arch}
-  rm -f LIB Singular
+# does not need to be in top directory
+mv $RPM_BUILD_ROOT%{_includedir}/{my,om}limits.h \
+    $RPM_BUILD_ROOT%{_includedir}/singular
 
-  pushd %{buildroot}%{_includedir}
-    [ -d %{name} ] || mkdir %{name}
-    mv -f *.h templates %{name}
-  popd
+# also installed in libdir
+rm -f $RPM_BUILD_ROOT%{_bindir}/*.so
+rm -f $RPM_BUILD_ROOT%{singulardir}/libsingular.so
+
+# already linked to libsingular.so; do not distribute static libraries
+# or just compiled objects.
+rm -f $RPM_BUILD_ROOT%{_libdir}/*.a $RPM_BUILD_ROOT%{_libdir}/*.o
+
+# avoid poluting libdir with dynamic modules
+pushd $RPM_BUILD_ROOT%{_libdir}
+    mkdir -p Singular
+    mv dbmsr.so p_Procs*.so Singular
 popd
 
-mkdir -p %{buildroot}%{_bindir}
-mkdir -p %{buildroot}%{singulardir}/LIB/gftables
-cp -fa Singular/LIB/*.lib %{buildroot}%{singulardir}/LIB
-cp -far Singular/LIB/gftables/* %{buildroot}%{singulardir}/LIB/gftables
-cp -fa Singular/LIB/surfex/surfex.jar %{buildroot}%{singulardir}/LIB
-mkdir -p %{buildroot}%{_bindir}
-cat > %{buildroot}%{_bindir}/Singular << EOF
+# create a script also setting SINGULARPATH
+mkdir -p $RPM_BUILD_ROOT%{_bindir}
+cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
 #!/bin/sh
 
-SINGULARPATH=%{singulardir}/LIB %{singulardir}/%{_arch}/Singular-3-1-3 \$*
+SINGULARPATH=%{singulardir} %{singulardir}/Singular-3-1-5 "\$@"
 EOF
-chmod +x %{buildroot}%{_bindir}/Singular
-ln -sf %{_bindir}/Singular %{buildroot}%{_bindir}/singular
+chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
 
-perl -pi -e								\
-	's|(java -jar) (surfex.jar)|$1 %{singulardir}/LIB/$2|;'		\
-	%{buildroot}%{singulardir}/LIB/surfex
+# TSingular
+cat > $RPM_BUILD_ROOT%{_bindir}/TSingular << EOF
+#!/bin/sh
 
-# these headers are included by installed ones, but not installed...
-mkdir -p %{buildroot}%{_includedir}/%{name}/Singular
-cp -fa Singular/*.h %{buildroot}%{_includedir}/%{name}/Singular
+%{singulardir}/TSingular --singular %{_bindir}/Singular "\$@"
+EOF
+chmod +x $RPM_BUILD_ROOT%{_bindir}/TSingular
 
-# correct includes
-perl %{SOURCE4}
+# remove some wrong executable permissions
+chmod 644 $RPM_BUILD_ROOT%{singulardir}/LIB/*.lib
 
-# keep only libsingular.h outside %{_includedir}/%{name}
-mv %{buildroot}%{_includedir}/%{name}/libsingular.h %{buildroot}%{_includedir}
-# files required during sagemath build, and/or side effect of sagemath patch
-cp kernel/kInline.cc %{buildroot}%{_includedir}/%{name}
-cp Singular/{attrib,grammar,ipid,ipshell,lists,subexpr,tok}.h  %{buildroot}%{_includedir}/%{name}
+# surfex
+cat > $RPM_BUILD_ROOT%{_bindir}/surfex << EOF
+#!/bin/sh
 
-# installed headers are only readable by file owner...
-chmod -R a+r %{buildroot}
-find %{buildroot}%{_includedir} -type f -exec chmod a-x {} \;
+%{singulardir}/surfex %{singulardir}/LIB/surfex "\$@"
+EOF
+chmod +x $RPM_BUILD_ROOT%{_bindir}/surfex
+mkdir -p $RPM_BUILD_ROOT%{singulardir}/LIB/surfex/doc
+install -m644 Singular/LIB/surfex/doc/surfex_doc_linux.pdf \
+    $RPM_BUILD_ROOT%{singulardir}/LIB/surfex/doc/surfex_doc_linux.pdf
 
-# move conflicting static files to archdir
-mv -f %{buildroot}%{_libdir}/*.a %{buildroot}%{singulardir}/%{_arch}
+# referenced in xemacs setup
+install -m644 emacs/singular.xpm $RPM_BUILD_ROOT%{_lispdir}/singular
 
-cp %{SOURCE5} %{SOURCE6} %{buildroot}%{singulardir}
+# remove suggested preferences
+rm -f $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-general
 
-rm -fr %{buildroot}%{_includedir}/NTL
+# emacs autostart
+sed -i "s|<your-singular-emacs-home-directory>|%{_ispdir}/singular|" \
+    $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-singular
+mkdir -p $RPM_BUILD_ROOT%{_emacs_sitestartdir}
+mv $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-singular \
+     $RPM_BUILD_ROOT%{_emacs_sitestartdir}/singular-init.el
 
-# correct wrong path
-perl -pi -e 's:(#\s*include <)(factory|kernel|omalloc)/:$1:;'	\
-	%{buildroot}%{_includedir}/%{name}/*.h			\
-	%{buildroot}%{_includedir}/%{name}/*.cc			\
-	%{buildroot}%{_includedir}/%{name}/Singular/*.h		\
-	%{buildroot}%{_includedir}/%{name}/templates/*.h	\
-	%{buildroot}%{_includedir}/%{name}/templates/*.cc
-perl -pi -e 's:(#\s*include")kernel/:$1:;'			\
-	%{buildroot}%{_includedir}/%{name}/Singular/*.h
+# ESingular
+cat > $RPM_BUILD_ROOT%{_bindir}/ESingular << EOF
+#!/bin/sh
 
-# (ugly) hack to have mmInit defined to a stub in libsingular.so
-pushd Singular
-    rm -f libsingular.so
-    rm -f misc_ip.o
-    make CXXFLAGS="%{optflags} -fPIC -DLIBSINGULAR -DHAVE_FACTORY -I../omalloc" \
-	LIBSINGULAR_FLAGS="-shared -L../omalloc" libsingular
-    cp -f libsingular.so %{buildroot}%{_libdir}
+export ESINGULAR_EMACS_LOAD=%{_emacs_sitestartdir}/singular-init.el
+export ESINGULAR_EMACS_DIR=%{_lispdir}/singular
+%{singulardir}/ESingular --singular %{_bindir}/Singular "\$@"
+EOF
+chmod +x $RPM_BUILD_ROOT%{_bindir}/ESingular
+
+pushd libfac
+    make DESTDIR=$RPM_BUILD_ROOT install
+    # not installed by default
+    install -m 644 libfac.a $RPM_BUILD_ROOT%{_libdir}/libfac.a
 popd
 
-%clean
-rm -rf %{buildroot}
+pushd factory
+    make DESTDIR=$RPM_BUILD_ROOT install
+# make a version without singular defined
+    make clean
+%configure \
+	--bindir=%{singulardir} \
+	--includedir=%{_includedir}/factory \
+	--with-apint=gmp \
+	--with-gmp=%{_prefix} \
+	--with-ntl=%{_prefix} \
+	--with-NTL \
+	--without-Singular \
+	--enable-gmp=%{_prefix}
+    # avoid missing "print" symbols not used elsewhere
+    make CPPFLAGS="-DNOSTREAMIO=1" %{?_smp_mflags}
+    # not built by default
+    make libcfmem.a
+    # do not run make install again, just install non singular factory files
+    install -m 644 libcf.a $RPM_BUILD_ROOT%{_libdir}
+    install -m 644 libcfmem.a $RPM_BUILD_ROOT%{_libdir}
+    # automatically generated file at install time ignores includedir
+    sed	-e 's|<factory|<factory/factory|' \
+	-e 's|<templates/|<factory/templates/|' \
+	-i $RPM_BUILD_ROOT%{_includedir}/factory/templates/ftmpl_inst.cc
+popd
 
 %files
-%defattr(-,root,root)
 %{_bindir}/Singular
-%{_bindir}/singular
+%{_bindir}/TSingular
+%doc %{singulardir}/COPYING
+%doc %{singulardir}/GPL2
+%doc %{singulardir}/GPL3
+%doc %{singulardir}/NEWS
+%doc %{singulardir}/README
 %dir %{singulardir}
-%dir %{singulardir}/%{_arch}
-%{singulardir}/%{_arch}/ESingular
-%{singulardir}/%{_arch}/LLL
-%{singulardir}/%{_arch}/Singular-3-1-3
-%{singulardir}/%{_arch}/TSingular
-%{singulardir}/%{_arch}/change_cost
-%{singulardir}/%{_arch}/gen_test
-%{singulardir}/%{_arch}/libparse
-%{singulardir}/%{_arch}/solve_IP
-%{singulardir}/%{_arch}/surfex
-%{singulardir}/%{_arch}/toric_ideal
-%{singulardir}/LIB
-%{singulardir}/singular.*
+%dir %{singulardir}/LIB
+%doc %{singulardir}/LIB/COPYING
+%{singulardir}/LIB/*.lib
+%{singulardir}/LIB/help.cnf
+%{singulardir}/LIB/gftables
+%{singulardir}/doc
+%{singulardir}/info
+%{singulardir}/change_cost
+%{singulardir}/gen_test
+%{singulardir}/libparse
+%{singulardir}/LLL
+%{singulardir}/Singular*
+%{singulardir}/solve_IP
+%{singulardir}/toric_ideal
+%{singulardir}/TSingular
+%{singulardir}/*.so
+%{_libdir}/libsingular.so
 
-%files		-n %{devname}
-%defattr(-,root,root)
-%{singulardir}/%{_arch}/*.so
-%dir %{_includedir}/%{name}
-%{_includedir}/%{name}/*
-%{_includedir}/*.h
-%{_libdir}/*.so
+%files		devel
+%{_includedir}/libsingular.h
+%{_includedir}/omalloc.h
+%{_includedir}/singular
 
-%files		-n %{staticname}
-%defattr(-,root,root)
-%{singulardir}/%{_arch}/*.o
-%{singulardir}/%{_arch}/*.a
+%files		-n factory-devel
+%doc factory/ChangeLog
+%doc factory/NEWS
+%doc factory/README
+%{_includedir}/factory
+%{_libdir}/libcf.a
+%{_libdir}/libcfmem.a
+%{_libdir}/libsingcf*.a
+
+%files		-n libfac-devel
+%doc libfac/00README
+%doc libfac/ChangeLog
+%doc libfac/COPYING
+%{_includedir}/factor.h
+%{_libdir}/libfac.a
+%{_libdir}/libsingfac*.a
+
+%files		examples
+%{singulardir}/examples
+
+%files		doc
+%doc %{singulardir}/html
+%doc %{singulardir}/*.html
+
+%files		surfex
+%{_bindir}/surfex
+%{singulardir}/surfex
+%{singulardir}/LIB/surfex
+
+%files		emacs
+%{_bindir}/ESingular
+%{singulardir}/ESingular
+%{_lispdir}/singular
