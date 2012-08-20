@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.5
-Release:	3
+Release:	4
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-5/Singular-3-1-5.tar.gz
@@ -332,6 +332,8 @@ pushd factory
 	-e 's|<templates/|<factory/templates/|' \
 	-i $RPM_BUILD_ROOT%{_includedir}/factory/templates/ftmpl_inst.cc
 popd
+sed -e 's|<\(cf_gmp.h>\)|<factory/\1' \
+    -i $RPM_BUILD_ROOT%{_includedir}/singular/si_gmp.h
 
 %files
 %{_bindir}/Singular
