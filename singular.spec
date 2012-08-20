@@ -287,9 +287,8 @@ rm -f $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-general
 # emacs autostart
 sed -i "s|<your-singular-emacs-home-directory>|%{_ispdir}/singular|" \
     $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-singular
-mkdir -p $RPM_BUILD_ROOT%{_emacs_sitestartdir}
 mv $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-singular \
-     $RPM_BUILD_ROOT%{_emacs_sitestartdir}/singular-init.el
+     $RPM_BUILD_ROOT%{_lispdir}/singular-init.el
 
 # ESingular
 cat > $RPM_BUILD_ROOT%{_bindir}/ESingular << EOF
@@ -332,7 +331,7 @@ pushd factory
 	-e 's|<templates/|<factory/templates/|' \
 	-i $RPM_BUILD_ROOT%{_includedir}/factory/templates/ftmpl_inst.cc
 popd
-sed -e 's|<\(cf_gmp.h>\)|<factory/\1' \
+sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
     -i $RPM_BUILD_ROOT%{_includedir}/singular/si_gmp.h
 
 %files
@@ -400,3 +399,4 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1' \
 %{_bindir}/ESingular
 %{singulardir}/ESingular
 %{_lispdir}/singular
+%{_lispdir}/singular-init.el
