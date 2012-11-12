@@ -1,0 +1,43 @@
+diff -up Singular-3-1-5/Singular/Makefile.in.orig Singular-3-1-5/Singular/Makefile.in
+--- Singular-3-1-5/Singular/Makefile.in.orig	2012-08-04 17:56:40.168206429 -0400
++++ Singular-3-1-5/Singular/Makefile.in	2012-08-04 17:57:37.334208654 -0400
+@@ -380,13 +380,13 @@ Singular${S_EXT}: mod2.h Makefile versio
+ 	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
+ 	  -o Singular${S_EXT} \
+ 	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
+-	  ${OBJS} ${LDFLAGS} ${LIBS} ../kernel/mmalloc.o 
++	  ${OBJS} ${LDFLAGS} -L../kernel -L../factory -L../libfac -L../omalloc -lkernel ${LIBS} ../kernel/mmalloc.o 
+ 
+ libsingular: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
+          iparith.o libparse.cc claptmpl.o mpsr_Tok.o $(DL_LIBS) 
+ 	$(LIBSINGULAR_LD) ${SLDFLAGS} ${LIBSINGULAR_FLAGS} -o libsingular.${SO_SUFFIX} \
+ 	iparith.o mpsr_Tok.o claptmpl.o \
+-	${OBJS} -lkernel -L../kernel -L../factory -L../libfac -L${libdir} ${LIBSINGULAR_LIBS}
++	${OBJS}  -L../kernel -L../factory -L../libfac -L../omalloc -lkernel -L${libdir} ${LIBSINGULAR_LIBS}
+ 
+ libsingular.a: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
+          iparith.o libparse.cc claptmpl.o mpsr_Tok.o
+@@ -437,7 +437,7 @@ version.h: ${SOURCES} ${HEADERS} Makefil
+ 	echo "#define CXX \"" ${CXX} ${CXXFLAGS} ${DEFS} "\"" >>version.h
+ 
+ libparse: libparse_main.o utils.o
+-	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o ../kernel/fegetopt.o ${LDFLAGS2} -lomalloc
++	${CXX}  ${CPPFLAGS} -DSTANDALONE_PARSER -o libparse libparse_main.o utils.o ../kernel/fegetopt.o ${LDFLAGS2} -L../omalloc -lomalloc
+ 
+ libparse_main.o: libparse.cc
+ 	${CXX} ${CPPFLAGS} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
+@@ -458,12 +458,12 @@ libparse.cc: libparse.l
+ ESingular: mod2.h feOpt.cc version.h emacs.cc \
+            feOptES.inc
+ 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -DPROTO -o ESingular emacs.cc ../kernel/fegetopt.o \
+-	${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
++	${LDFLAGS} -L../kernel -L../factory -L../libfac -L../omalloc ${LIBS} ../kernel/mmalloc.o
+ 
+ TSingular: mod2.h feOpt.cc version.h emacs.cc \
+            feOptTS.inc
+ 	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DTSINGULAR -DPROTO -o TSingular emacs.cc ../kernel/fegetopt.o \
+-	${LDFLAGS} ${LIBS} ../kernel/mmalloc.o
++	${LDFLAGS} -L../kernel -L../factory -L../libfac -L../omalloc ${LIBS} ../kernel/mmalloc.o
+ 
+ feOpt.o: feOpt.inc feOptES.inc feOptTS.inc
+ extra.o: feOpt.inc

@@ -1,0 +1,89 @@
+diff -up Singular-3-1-5/factory/memutil.c.orig Singular-3-1-5/factory/memutil.c
+--- Singular-3-1-5/factory/memutil.c.orig	2012-08-04 19:27:46.730415777 -0400
++++ Singular-3-1-5/factory/memutil.c	2012-08-04 19:27:49.200415874 -0400
+@@ -19,6 +19,10 @@ typedef struct dummy_le {
+ 
+ static listentry * blocklist[7] = { NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+ 
++#define EXTRA 4
++#define MAGIC 0xbeefbeef
++#define DEAD 0xdeaddead
++
+ #define GETBLOCK( list, size ) { \
+                                   if ( blocklist[list] ) { \
+ 				      listentry* retval = blocklist[list]; \
+@@ -27,32 +31,34 @@ static listentry * blocklist[7] = { NULL
+ 				  } \
+ 				  else { \
+ 				      char* retval = (char*)malloc( size ); \
+-				      *((int*)retval) = size-4; \
+-				      retval += 4; \
++				      *((int*)retval) = size-4-EXTRA; \
++				      *((int*)retval+1) = MAGIC; \
++				      retval += 4+EXTRA; \
+ 				      return (void*)retval; \
+ 				  } \
+                                }
+ 
+ void* getBlock ( size_t size )
+ {
+-    if ( size <= 4 )
++    if ( size <= 4 - EXTRA )
+ 	GETBLOCK( 0, 8 )
+-    else if ( size <= 12 )
++    else if ( size <= 12 - EXTRA )
+ 	GETBLOCK( 1, 16 )
+-    else if ( size <= 28 )
++    else if ( size <= 28 - EXTRA )
+ 	GETBLOCK( 2, 32 )
+-    else if ( size <= 60 )
++    else if ( size <= 60 - EXTRA )
+ 	GETBLOCK( 3, 64 )
+-    else if ( size <= 124 )
++    else if ( size <= 124 - EXTRA )
+ 	GETBLOCK( 4, 128 )
+-    else if ( size <= 252 )
++    else if ( size <= 252 - EXTRA )
+ 	GETBLOCK( 5, 256 )
+-    else if ( size <= 508 )
++    else if ( size <= 508 - EXTRA )
+ 	GETBLOCK( 6, 512 )
+     else {
+-	char* retval = (char*)malloc( size+4 );
++	char* retval = (char*)malloc( size+4+EXTRA );
+ 	*((int*)retval) = size;
+-	retval += 4;
++	*((int*)retval+1) = MAGIC;
++	retval += 4+EXTRA;
+ 	return retval;
+     }
+ }
+@@ -63,12 +69,14 @@ void* getBlock ( size_t size )
+ 				     blocklist[list] = dummy; \
+ 				 }
+ 
+-void freeBlock ( void* block, size_t size )
++void freeBlock ( void* block, size_t size0 )
+ {
+     char* dummy = (char*)block;
+     if ( block == NULL ) return;
+-    dummy -= 4;
+-    size = *((int*)dummy);
++    dummy -= 4+EXTRA;
++    int magic = *((int*)dummy+1);
++    ASSERT( magic == MAGIC , "freeBlock: wrong magic number" );
++    int size = *((int*)dummy);
+     if ( size == 4 )
+ 	FREEBLOCK( 0, block )
+     else if ( size == 12 )
+@@ -91,7 +99,9 @@ void* reallocBlock ( void* block, size_t
+ {
+   void * dummy;
+ #if 1
+-  char* dum = (char*)block - 4;
++  char* dum = (char*)block - 4 - EXTRA;
++  int magic = *((int*)dum+1);
++  ASSERT( magic == MAGIC , "reallocBlock: wrong magic number" );
+   int size = *((int*)dum);
+   if (newsize <= size) return block;
+ #endif

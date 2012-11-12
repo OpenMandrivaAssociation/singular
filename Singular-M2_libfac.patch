@@ -1,0 +1,9 @@
+diff -up Singular-3-1-5/libfac/factor/tmpl_inst.cc.orig Singular-3-1-5/libfac/factor/tmpl_inst.cc
+--- Singular-3-1-5/libfac/factor/tmpl_inst.cc.orig	2012-08-04 18:15:20.769249365 -0400
++++ Singular-3-1-5/libfac/factor/tmpl_inst.cc	2012-08-04 18:15:29.614249673 -0400
+@@ -91,3 +91,5 @@ template class Array<Variable>;
+ template class List<CFFList>;
+ template class ListIterator<CFFList>;
+ #endif /* HAVE_DATABASE */
++
++template bool find<CanonicalForm>(List<CanonicalForm> const&, CanonicalForm const&);

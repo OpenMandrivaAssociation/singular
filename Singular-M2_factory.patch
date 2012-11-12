@@ -1,0 +1,61 @@
+diff -up Singular-3-1-5/factory/assert.h.orig Singular-3-1-5/factory/assert.h
+--- Singular-3-1-5/factory/assert.h.orig	2012-08-04 18:08:48.593234332 -0400
++++ Singular-3-1-5/factory/assert.h	2012-08-04 18:09:05.862235016 -0400
+@@ -5,6 +5,9 @@
+ #define NOASSERT
+ #endif
+ 
++/* need a declaration of "abort" */
++#include <stdlib.h>
++
+ /* It should be possible to include this file multiple times for different */
+ /* settings of NOASSERT */
+ 
+diff -up Singular-3-1-5/factory/cf_gcd_smallp.h.orig Singular-3-1-5/factory/cf_gcd_smallp.h
+--- Singular-3-1-5/factory/cf_gcd_smallp.h.orig	2012-08-04 18:10:02.561237177 -0400
++++ Singular-3-1-5/factory/cf_gcd_smallp.h	2012-08-04 18:10:33.302238429 -0400
+@@ -22,8 +22,7 @@
+ #include <config.h>
+ 
+ #include "assert.h"
+-
+-#include "cf_factory.h"
++#include <factory/cf_factory.h>
+ 
+ CanonicalForm GCD_Fp_extension (const CanonicalForm& F, const CanonicalForm& G,
+                   Variable & alpha, CFList& l, bool& top_level);
+diff -up Singular-3-1-5/factory/facFqSquarefree.h.orig Singular-3-1-5/factory/facFqSquarefree.h
+--- Singular-3-1-5/factory/facFqSquarefree.h.orig	2012-08-04 18:12:00.800241643 -0400
++++ Singular-3-1-5/factory/facFqSquarefree.h	2012-08-04 18:12:07.254241955 -0400
+@@ -16,6 +16,7 @@
+ 
+ #include "assert.h"
+ #include "fac_sqrfree.h"
++#include <factory/cf_factory.h>
+ 
+ /// squarefree factorization over a finite field
+ /// @a return a list of squarefree factors with multiplicity
+diff -up Singular-3-1-5/factory/gfops.cc.orig Singular-3-1-5/factory/gfops.cc
+--- Singular-3-1-5/factory/gfops.cc.orig	2012-08-04 18:13:02.097244019 -0400
++++ Singular-3-1-5/factory/gfops.cc	2012-08-04 18:13:08.815244345 -0400
+@@ -215,7 +215,7 @@ static bool gf_valid_combination ( int p
+ 
+ void gf_setcharacteristic ( int p, int n, char name )
+ {
+-    ASSERT( gf_valid_combination( p, n ), "illegal immediate GF(q)" );
++    //ASSERT( gf_valid_combination( p, n ), "illegal immediate GF(q)" );
+     gf_name = name;
+     gf_get_table( p, n );
+ }
+diff -up Singular-3-1-5/factory/variable.cc.orig Singular-3-1-5/factory/variable.cc
+--- Singular-3-1-5/factory/variable.cc.orig	2012-08-04 18:13:36.281245270 -0400
++++ Singular-3-1-5/factory/variable.cc	2012-08-04 18:13:42.750245574 -0400
+@@ -159,7 +159,7 @@ static CanonicalForm conv2mipo ( const C
+ 
+ Variable rootOf( const CanonicalForm & mipo, char name )
+ {
+-    ASSERT (mipo.isUnivariate(), "not a legal extension");
++    //ASSERT (mipo.isUnivariate(), "not a legal extension");
+ 
+     int l;
+     if ( var_names_ext == 0 ) {

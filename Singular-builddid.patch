@@ -1,0 +1,37 @@
+diff -up Singular-3-1-5/kernel/Makefile.in.orig Singular-3-1-5/kernel/Makefile.in
+--- Singular-3-1-5/kernel/Makefile.in.orig	2012-08-04 18:03:51.080222960 -0400
++++ Singular-3-1-5/kernel/Makefile.in	2012-08-04 18:04:24.214224110 -0400
+@@ -264,7 +264,7 @@ p_Procs_Dynamic.inc: p_Procs_Generate.cc
+ 	-rm -f p_Procs_Dynamic p_Procs_Dynamic.exe
+ 
+ p_Procs_%.so: p_Procs_Lib_%.dl_o
+-	$(LD) ${SLDFLAGS} -o $@ $^
++	$(CXX) ${SLDFLAGS} -o $@ $^
+ 
+ ##
+ ## install targets
+@@ -374,7 +374,7 @@ DEFSG		= -D@SING_UNAME@ @DEFS@ -DDL_TAIL
+ ##
+ 
+ p_Procs_%.sog: p_Procs_Lib_%.dl_og
+-	$(LD) ${SLDFLAGS} -o $@ $^
++	$(CXX) ${SLDFLAGS} -o $@ $^
+ 
+ p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
+ 	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
+diff -up Singular-3-1-5/Singular/Makefile.in.orig Singular-3-1-5/Singular/Makefile.in
+--- Singular-3-1-5/Singular/Makefile.in.orig	2012-08-04 18:03:11.368221411 -0400
++++ Singular-3-1-5/Singular/Makefile.in	2012-08-04 18:03:39.574222448 -0400
+@@ -484,10 +484,10 @@ feOptTS.inc: feOpt.cc mod2.h
+ 	rm -f feOptTS feOptTS.exe
+ 
+ mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
+-	$(LD) ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS} ${GLIBC_DYN_FIX}
++	$(LIBSINGULAR_LD) ${SLDFLAGS} -o $@ $^ -L${libdir} ${MP_LIBS} ${GLIBC_DYN_FIX}
+ 
+ dbmsr.so: $(DBMSR_SOURCES:.cc=.dl_o)
+-	$(LD) ${SLDFLAGS} -o $@ $^ ${GLIBC_DYN_FIX}
++	$(LIBSINGULAR_LD) ${SLDFLAGS} -o $@ $^ ${GLIBC_DYN_FIX}
+ 
+ # dynamic module for python bject support
+ pyobject.${MODULE_SUFFIX}: pyobject.dl_o

@@ -1,0 +1,36 @@
+diff -up Singular-3-1-5/kernel/Makefile.in.orig Singular-3-1-5/kernel/Makefile.in
+--- Singular-3-1-5/kernel/Makefile.in.orig	2012-08-04 17:54:55.264202400 -0400
++++ Singular-3-1-5/kernel/Makefile.in	2012-08-04 17:55:04.630202786 -0400
+@@ -48,7 +48,7 @@ PIPE		= @PIPE@
+ CFLAGS		= @CFLAGS@ ${PIPE} 
+ CXXFLAGS	= @CXXFLAGS@ ${PIPE} 
+ CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
+-CPPFLAGS	= -I${srcdir} -I.. -I@prefix@  @CPPFLAGS@ 
++CPPFLAGS	= -I${srcdir} -I.. -I../omalloc -I${srcdir}/../factory -I@prefix@  @CPPFLAGS@ 
+ DEFS		= -DNDEBUG -DOM_NDEBUG -D@SING_UNAME@ @DEFS@
+ LDFLAGS		= @LDFLAGS@
+ LD_DYN_FLAGS	= @LD_DYN_FLAGS@
+diff -up Singular-3-1-5/libfac/Makefile.in.orig Singular-3-1-5/libfac/Makefile.in
+--- Singular-3-1-5/libfac/Makefile.in.orig	2012-08-04 17:55:16.304203237 -0400
++++ Singular-3-1-5/libfac/Makefile.in	2012-08-04 17:55:40.814204128 -0400
+@@ -36,7 +36,7 @@ MKINSTALLDIRS	= ./mkinstalldirs
+ ##
+ CXXFLAGS	= @CXXFLAGS@
+ CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@
+-CPPFLAGS	= -I${srcdir}/factor -I${srcdir}/charset -I${srcdir} -I.. -I${prefix} @CPPFLAGS@ 
++CPPFLAGS	= -I${srcdir}/factor -I${srcdir}/charset -I${srcdir} -I${srcdir}/.. -I${srcdir}/../factory -I${prefix} @CPPFLAGS@ 
+ DEFS		= @DEFS@ 
+ LDFLAGS		= @LDFLAGS@
+ LIBS		= -lfac -lcf -lcfmem -lgmp @LIBS@
+diff -up Singular-3-1-5/Singular/Makefile.in.orig Singular-3-1-5/Singular/Makefile.in
+--- Singular-3-1-5/Singular/Makefile.in.orig	2012-08-04 17:55:48.264204456 -0400
++++ Singular-3-1-5/Singular/Makefile.in	2012-08-04 17:56:08.798205182 -0400
+@@ -76,7 +76,7 @@ CFLAGS		= @CFLAGS@ ${PIPE}
+ CXXFLAGS	= @CXXFLAGS@ -I.. -I@prefix@ ${PIPE}
+ CXXTEMPLFLAGS	= @CXXTEMPLFLAGS@ -I.. -I@prefix@
+ ifneq ($(SINGUNAME),ix86-Win)
+-CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@
++CPPFLAGS	= -I${srcdir} -I${srcdir}/.. -I${srcdir}/../omalloc -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@
+ else
+ ## Dirs after @CPPFLAGS@ are for PySingular
+ CPPFLAGS	= -I${srcdir} -I.. -I@prefix@ @CPPFLAGS@ @PYTHON_CPPFLAGS@
