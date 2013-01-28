@@ -6,13 +6,14 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.5
-Release:	6
+Release:	7
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-5/Singular-3-1-5.tar.gz
 Source1:	singular.hlp
 Source2:	singular.idx
 URL:		http://www.singular.uni-kl.de/
+BuildRequires:	dos2unix
 BuildRequires:	emacs
 BuildRequires:	flex
 BuildRequires:	gmp-devel
@@ -335,6 +336,8 @@ popd
 sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
     -i $RPM_BUILD_ROOT%{_includedir}/singular/si_gmp.h
 
+dos2unix $RPM_BUILD_ROOT%{singulardir}/LIB/*.lib
+
 %files
 %{_bindir}/Singular
 %{_bindir}/TSingular
@@ -404,6 +407,12 @@ sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
 
 
 %changelog
+* Mon Jan 28 2013 Paulo Andrade <pcpa@mandriva.com.br> 3.1.5-7
+- Convert line ending of several files to unix format.
+
+* Mon Jan 28 2013 Paulo Andrade <pcpa@mandriva.com.br> 3.1.5-6
+- Correct singular-devel to require singular.
+
 * Tue Aug 28 2012 Paulo Andrade <pcpa@mandriva.com.br> 3.1.5-5
 + Revision: 815910
 - Rebuild.
