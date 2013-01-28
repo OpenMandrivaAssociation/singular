@@ -6,7 +6,7 @@
 Name:		%{name}
 Summary:	Computer Algebra System for polynomial computations
 Version:	3.1.5
-Release:	5
+Release:	6
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-5/Singular-3-1-5.tar.gz
@@ -74,6 +74,7 @@ This package contains the Singular development files.
 Summary:	C++ class library for multivariate polynomial data
 Group:		Development/Other
 Requires:	gmp-devel
+Requires:	%{name} = %{version}-%{release}
 Obsoletes:	factory-static < %{version}-%{release}
 Provides:	factory-static = %{version}-%{release}
 
