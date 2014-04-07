@@ -72,6 +72,8 @@ Patch12:	Singular-ntl6.patch
 Patch13:	Singular-arches.patch
 # Adapt to changes in flint 2.4
 Patch14:	Singular-flint24.patch
+# Do not include c++ headers from C code
+Patch15:	Singular-cplusplus.patch
 
 ## Macaulay2 patches
 Patch20: Singular-M2_factory.patch
@@ -280,9 +282,10 @@ pushd factory
 	--enable-gmp=%{_prefix}
     make %{?_smp_mflags}
 popd
+%patch15 -p1
 
 # kernel needs factory built
-make %{?_smp_mflags} CC=g++ CFLAGS="$CFLAGS -fpermissive" -C kernel
+make %{?_smp_mflags} -C kernel
 
 # libfac needs factory built
 pushd libfac

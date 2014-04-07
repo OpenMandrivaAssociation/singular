@@ -1,0 +1,15 @@
+--- Singular-3-1-5/factory/cf_gmp.h.orig	2014-04-07 13:28:14.627029884 -0300
++++ Singular-3-1-5/factory/cf_gmp.h	2014-04-07 13:29:04.739029150 -0300
+@@ -2309,6 +2309,7 @@ enum
+ // ISO C++ 14882: 27.2  Forward declarations
+ //
+ 
++#if defined (__cplusplus)
+ #ifndef _GLIBCXX_IOSFWD
+ #define _GLIBCXX_IOSFWD 1
+ 
+@@ -2487,3 +2488,4 @@ _GLIBCXX_END_NAMESPACE_VERSION
+ } // namespace
+ 
+ #endif /* _GLIBCXX_IOSFWD */
++#endif /* __cplusplus */
