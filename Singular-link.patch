@@ -1,6 +1,15 @@
 diff -up Singular-3-1-5/Singular/Makefile.in.orig Singular-3-1-5/Singular/Makefile.in
---- Singular-3-1-5/Singular/Makefile.in.orig	2012-08-04 17:56:40.168206429 -0400
-+++ Singular-3-1-5/Singular/Makefile.in	2012-08-04 17:57:37.334208654 -0400
+--- Singular-3-1-5/Singular/Makefile.in.orig	2013-08-16 12:04:36.573104279 -0300
++++ Singular-3-1-5/Singular/Makefile.in	2013-08-16 12:03:27.957101652 -0300
+@@ -132,7 +132,7 @@ HAVE_MPSR       = @HAVE_MPSR@
+ #
+ # Handle libSINGULAR stuff
+ #
+-LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc
++LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc -lpthread -ldl
+ 
+ SO_SUFFIX = so
+ 
 @@ -380,13 +380,13 @@ Singular${S_EXT}: mod2.h Makefile versio
  	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
  	  -o Singular${S_EXT} \

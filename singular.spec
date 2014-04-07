@@ -1,29 +1,42 @@
 %define		name			singular
 %define		old_libsingular_devel	%mklibname %{name} -d
 %define		old_libsingular_static	%mklibname %{name} -d -s
-%define		singulardir		%{_libdir}/Singular
+%global		singulardir		%{_libdir}/Singular
+%global		upstreamver		3-1-5
+
+# If a library used by both polymake and Singular is updated, neither can be
+# rebuilt, because each BRs the other and both are linked against the old
+# version of the library.  Use this to rebuild Singular without polymake
+# support, rebuild polymake, then build Singular again with polymake support.
+%bcond_with polymake
 
 Name:		%{name}
+Version:	%(tr - . <<<%{upstreamver})
+Release:	9
 Summary:	Computer Algebra System for polynomial computations
-Version:	3.1.5
-Release:	8
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/3-1-5/Singular-3-1-5.tar.gz
+Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/Singular-%{upstreamver}.tar.gz
 Source1:	singular.hlp
 Source2:	singular.idx
 URL:		http://www.singular.uni-kl.de/
+BuildRequires:	cddlib-devel
 BuildRequires:	dos2unix
 BuildRequires:	emacs
-Requires:	factory-gftables = %{version}-%{release}
 BuildRequires:	flex
+BuildRequires:	flint-devel
 BuildRequires:	gmp-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	ntl-devel
+%if %{with polymake}
+BuildRequires:	polymake-devel
+%endif
 BuildRequires:	readline-devel
 BuildRequires:	sharutils
 BuildRequires:	texinfo
 BuildRequires:	texlive
+Requires:	factory-gftables = %{version}-%{release}
+Requires:	less
 Requires:	surf
 
 # Use destdir in install targets
@@ -38,7 +51,7 @@ Patch4:		Singular-doc.patch
 # Correct koji error:
 # ** ERROR: No build ID note found in /builddir/build/BUILDROOT/Singular-3.1.3-1.fc16.x86_64/usr/lib64/Singular/dbmsr.so
 Patch5:		Singular-builddid.patch
-# Correct undefined symbol in libsingular
+# Correct undefined symbols in libsingular
 # This patch removes a hack to avoid duplicated symbols in tesths.cc
 # when calling mp_set_memory_functions, what is a really a bad idea on
 # a shared library.
@@ -55,6 +68,10 @@ Patch10:	singular_trac_441.patch
 Patch11:	Singular-semaphore.patch
 # Adapt to new template code in NTL 6
 Patch12:	Singular-ntl6.patch
+# Support ARM and S390(x) architectures
+Patch13:	Singular-arches.patch
+# Adapt to changes in flint 2.4
+Patch14:	Singular-flint24.patch
 
 ## Macaulay2 patches
 Patch20: Singular-M2_factory.patch
@@ -145,13 +162,13 @@ Requires:	%{name} = %{version}-%{release}
 Emacs mode for Singular.
 
 %prep
-%setup -q -n Singular-3-1-5
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+%setup -q -n Singular-%{upstreamver}
+%patch1 -p1 -b .destdir
+%patch2 -p1 -b .headers
+%patch3 -p1 -b .link
 %patch4 -p1
-%patch5 -p1
-%patch6 -p1
+%patch5 -p1 -b .builddid
+%patch6 -p1 -b .undefined
 
 %patch7 -p1
 %patch8 -p1
@@ -160,6 +177,8 @@ Emacs mode for Singular.
 
 %patch11 -p1
 %patch12 -p1
+%patch13 -p1
+%patch14 -p1 -b .flint24
 
 %patch20 -p1 -b .M2_factory
 %patch21 -p1 -b .M2_memutil_debuggging
@@ -167,19 +186,49 @@ Emacs mode for Singular.
 
 sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
     -e "s|explicit_gftabledir=.*|explicit_gftabledir='%{singulardir}/LIB/gftables'|" \
-    factory/configure.in
+    factory/configure.in factory/configure
 
 # Build the debug libfactory with the right CFLAGS
 sed -i 's/\($(CPPFLAGS)\) \($(FLINT_CFLAGS)\)/\1 $(CFLAGS) \2/' \
     factory/GNUmakefile.in
 
+# Build the debug kernel with the right CFLAGS
+sed -ri 's/(C(XX)?FLAGS)(.*= )-g/\1\3$(\1)/' kernel/Makefile.in
+
+# Build libparse with the right CFLAGS
+sed -r 's/(\$\{CXX\})[[:blank:]]+(-O2[[:blank:]]+)?(\$\{CPPFLAGS\})/\1 $\{CXXFLAGS\} \3/' \
+    -i Singular/Makefile.in
+
 # Force use of system ntl
 rm -fr ntl
 
+# Adapt to the Fedora flint package
+mkdir flint
+ln -s %{_includedir}/flint flint/include
+ln -s %{_libdir} flint/lib
+sed -i 's/lmpir/lgmp/' factory/configure Singular/configure
+
+# Unbreak the (call)gfanlib install
+sed -i '/^install:/iinstall-libsingular:\n' \
+    gfanlib/Makefile.in callgfanlib/Makefile.in callpolymake/Makefile.in
+sed -ri 's/@(prefix|exec_prefix|libdir|includedir)@/$(DESTDIR)&/g' \
+    gfanlib/Makefile.in
+
+# Fix the default paths
+sed -e 's/"S_UNAME"/Singular/' \
+    -e 's/"S_UNAME/Singular"/' \
+    -e 's,%b/\.\.,%b,' \
+    -e 's,S_ROOT_DIR,"%{_libdir}",' \
+    -i.orig kernel/feResource.cc
+touch -r kernel/feResource.cc.orig kernel/feResource.cc
+
+# TEMPORARY: Remove this once Singular ships an updated version
+cp -p %{SOURCE1} Singular/LIB
+
 %build
-export CFLAGS="%{optflags} -fPIC"
+export CFLAGS="%{optflags} -fPIC -fsigned-char -I%{_includedir}/cddlib -I%{_includedir}/flint"
 export CXXFLAGS=$CFLAGS
-export LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed"
+export LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
 export LIBS="-lpthread -ldl"
 
 # build components in specific order to not need to build & install
@@ -187,6 +236,7 @@ export LIBS="-lpthread -ldl"
 %configure \
 	--bindir=%{singulardir} \
 	--with-apint=gmp \
+	--with-flint=$PWD/flint \
 	--with-gmp=%{_prefix} \
 	--with-ntl=%{_prefix} \
 	--with-NTL \
@@ -199,6 +249,10 @@ export LIBS="-lpthread -ldl"
 	--enable-factory \
 	--enable-libfac \
 	--enable-IntegerProgramming \
+	--enable-gfanlib \
+%if %{with polymake}
+	--enable-polymake \
+%endif
 	--disable-doc \
 	--with-malloc=system
 # remove bogus -L/usr/kernel from linker command line and
@@ -208,12 +262,17 @@ sed -i 's|-L%{_prefix}/kernel||g;s|-L%{_libdir}||g' Singular/Makefile
 make %{?_smp_mflags} Singular
 # factory needs omalloc built
 make %{?_smp_mflags} -C omalloc
+%if %{with polymake}
+# polymake interface needs gfanlib built
+make %{?_smp_mflags} -C gfanlib
+%endif
 
 pushd factory
 %configure \
 	--bindir=%{singulardir} \
 	--includedir=%{_includedir}/factory \
 	--with-apint=gmp \
+	--with-flint=$PWD/../flint \
 	--with-gmp=%{_prefix} \
 	--with-ntl=%{_prefix} \
 	--with-NTL \
@@ -230,6 +289,7 @@ pushd libfac
 %configure \
 	--bindir=%{singulardir} \
 	--with-apint=gmp \
+	--with-flint=$PWD/../flint \
 	--with-gmp=%{_prefix} \
 	--with-ntl=%{_prefix} \
 	--with-NTL \
@@ -270,12 +330,16 @@ done
 popd
 
 # does not need to be in top directory
+mkdir $RPM_BUILD_ROOT%{_includedir}/gfanlib
+mv $RPM_BUILD_ROOT%{_includedir}/gfanlib*.h \
+    $RPM_BUILD_ROOT%{_includedir}/gfanlib
 mv $RPM_BUILD_ROOT%{_includedir}/{my,om}limits.h \
     $RPM_BUILD_ROOT%{_includedir}/singular
 
 # also installed in libdir
 rm -f $RPM_BUILD_ROOT%{_bindir}/*.so
 rm -f $RPM_BUILD_ROOT%{singulardir}/libsingular.so
+rm -f $RPM_BUILD_ROOT%{singulardir}/polymake.so
 
 # already linked to libsingular.so; do not distribute static libraries
 # or just compiled objects.
@@ -292,7 +356,7 @@ mkdir -p $RPM_BUILD_ROOT%{_bindir}
 cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
 #!/bin/sh
 
-SINGULARPATH=%{singulardir} %{singulardir}/Singular-3-1-5 "\$@"
+SINGULARPATH=%{singulardir} %{singulardir}/Singular-%{upstreamver} "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
 
@@ -354,13 +418,14 @@ pushd factory
 	--bindir=%{singulardir} \
 	--includedir=%{_includedir}/factory \
 	--with-apint=gmp \
+	--with-flint=$PWD/../flint \
 	--with-gmp=%{_prefix} \
 	--with-ntl=%{_prefix} \
 	--with-NTL \
 	--without-Singular \
 	--enable-gmp=%{_prefix}
     # avoid missing "print" symbols not used elsewhere
-    make CPPFLAGS="-DNOSTREAMIO=1" %{?_smp_mflags}
+    make CPPFLAGS="-I%{_includedir}/flint -DNOSTREAMIO=1" %{?_smp_mflags}
     # not built by default
     make libcfmem.a
     # do not run make install again, just install non singular factory files
@@ -404,8 +469,12 @@ dos2unix $RPM_BUILD_ROOT%{singulardir}/LIB/*.lib
 %{singulardir}/TSingular
 %{singulardir}/*.so
 %{_libdir}/libsingular.so
+%if %{with polymake}
+%{_libdir}/polymake.so
+%endif
 
 %files		devel
+%{_includedir}/gfanlib
 %{_includedir}/libsingular.h
 %{_includedir}/omalloc.h
 %{_includedir}/singular

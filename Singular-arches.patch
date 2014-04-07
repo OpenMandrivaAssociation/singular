@@ -1,0 +1,186 @@
+diff -up Singular-3-1-5/kernel/mod2.h.cmake.in.orig Singular-3-1-5/kernel/mod2.h.cmake.in
+--- Singular-3-1-5/kernel/mod2.h.cmake.in.orig	2012-07-12 08:24:57.000000000 -0600
++++ Singular-3-1-5/kernel/mod2.h.cmake.in	2014-03-04 12:30:00.000000000 -0700
+@@ -157,6 +157,10 @@
+ #cmakedefine SI_CPU_IA64 1
+ /* CPU type: x86_64: */
+ #cmakedefine SI_CPU_X86_64 1
++/* CPU type: arm: */
++#cmakedefine SI_CPU_ARM 1
++/* CPU type: s390 / s390x: */
++#cmakedefine SI_CPU_S390 1
+ 
+ /*******************************************************************
+  * Defines which are not set by configure
+diff -up Singular-3-1-5/kernel/structs.h.orig Singular-3-1-5/kernel/structs.h
+--- Singular-3-1-5/kernel/structs.h.orig	2012-07-12 08:24:57.000000000 -0600
++++ Singular-3-1-5/kernel/structs.h	2014-03-04 12:30:00.000000000 -0700
+@@ -61,6 +61,20 @@ typedef void * ADDRESS;
+   // #ifdef HAVE_MULT_MOD
+   // #define HAVE_DIV_MOD
+   // #endif
++#elif defined(SI_CPU_ARM)
++  // FIXME: need to run some tests
++  #define HAVE_MULT_MOD
++  // #define HAVE_GENERIC_ADD
++  #ifdef HAVE_MULT_MOD
++  #define HAVE_DIV_MOD
++  #endif
++#elif defined(SI_CPU_S390)
++  // FIXME: need to run some tests
++  // #define HAVE_MULT_MOD
++  #define HAVE_GENERIC_ADD
++  // #ifdef HAVE_MULT_MOD
++  // #define HAVE_DIV_MOD
++  // #endif
+ #endif
+ 
+ #if SIZEOF_LONG == 4
+diff -up Singular-3-1-5/Singular/mod2.h.in.orig Singular-3-1-5/Singular/mod2.h.in
+--- Singular-3-1-5/Singular/mod2.h.in.orig	2012-07-12 08:24:57.000000000 -0600
++++ Singular-3-1-5/Singular/mod2.h.in	2014-03-04 12:30:00.000000000 -0700
+@@ -162,6 +162,10 @@
+ #undef SI_CPU_IA64
+ /* CPU type: x86_64: */
+ #undef SI_CPU_X86_64
++/* CPU type: arm: */
++#undef SI_CPU_ARM
++/* CPU type: s390 / s390x: */
++#undef SI_CPU_S390
+ /* whether development version of python is available */
+ #undef HAVE_PYTHON
+ /* whether static development version of python is available */
+diff -up singuname.sh.orig singuname.sh
+--- Singular-3-1-5/singuname.sh.orig	2012-07-12 08:24:57.000000000 -0600
++++ Singular-3-1-5/singuname.sh	2014-03-04 12:30:00.000000000 -0700
+@@ -202,7 +202,7 @@ then
+ elif (echo $uname_m | $egrep "Power Macintosh" > $devnull)
+ then
+     prefix="ppcMac"
+-    if( uname -s | $egrep "Darwin" > $devnull)
++    if (uname -s | $egrep "Darwin" > $devnull)
+     then
+         echo ${prefix}-darwin
+         exit 0
+@@ -242,6 +242,30 @@ then
+     if (echo $uname_a | $egrep "Linux" > $devnull)
+     then
+         echo ${prefix}-Linux
++        exit 0
++    else
++        echo ${prefix}-Unknown
++        exit 1
++    fi
++# arm-Linux ##########################################################
++elif (echo $uname_m | $egrep "arm" > $devnull)
++then
++    prefix=arm
++    if (echo $uname_a | $egrep "Linux" > $devnull)
++    then
++        echo ${prefix}-Linux
++        exit 0
++    else
++        echo ${prefix}-Unknown
++        exit 1
++    fi
++# s390(x)-Linux ######################################################
++elif (echo $uname_m | $egrep "s390" > $devnull)
++then
++    prefix=s390
++    if (echo $uname_a | $egrep "Linux" > $devnull)
++    then
++        echo ${prefix}-Linux
+         exit 0
+     else
+         echo ${prefix}-Unknown
+diff -dup Singular-3-1-5/Singular/configure.in.orig Singular-3-1-5/Singular/configure.in
+--- Singular-3-1-5/Singular/configure.in.orig	2012-07-12 08:24:57.000000000 -0600
++++ Singular-3-1-5/Singular/configure.in	2014-03-04 12:30:00.000000000 -0700
+@@ -436,6 +436,16 @@ if test "$ac_cv_singuname" = ppcMac-darw
+   AC_SUBST(SI_CPU_PPC)
+   AC_MSG_RESULT(SI_CPU_PPC)
+ fi
++if test "$ac_cv_singuname" = arm-Linux; then
++  AC_DEFINE(SI_CPU_ARM)
++  AC_SUBST(SI_CPU_ARM)
++  AC_MSG_RESULT(SI_CPU_ARM)
++fi
++if test "$ac_cv_singuname" = s390-Linux; then
++  AC_DEFINE(SI_CPU_S390)
++  AC_SUBST(SI_CPU_S390)
++  AC_MSG_RESULT(SI_CPU_S390)
++fi
+ # test again with CPU names
+ if test "$ac_cv_singcpuname" = i386; then
+   AC_DEFINE(SI_CPU_I386)
+@@ -467,6 +477,16 @@ if test "$ac_cv_singcpuname" = ppc; then
+   AC_SUBST(SI_CPU_PPC)
+   AC_MSG_RESULT(SI_CPU_PPC)
+ fi
++if test "$ac_cv_singcpuname" = arm; then
++  AC_DEFINE(SI_CPU_ARM)
++  AC_SUBST(SI_CPU_ARM)
++  AC_MSG_RESULT(SI_CPU_ARM)
++fi
++if test "$ac_cv_singcpuname" = s390; then
++  AC_DEFINE(SI_CPU_S390)
++  AC_SUBST(SI_CPU_S390)
++  AC_MSG_RESULT(SI_CPU_S390)
++fi
+ 
+ SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
+ AC_SUBST(SING_UNAME)
+diff -up Singular-3-1-5/Singular/configure.orig Singular-3-1-5/Singular/configure
+--- Singular-3-1-5/Singular/configure.orig	2012-07-12 08:24:57.000000000 -0600
++++ Singular-3-1-5/Singular/configure	2014-03-04 12:30:00.000000000 -0700
+@@ -665,6 +665,8 @@ SINGULAR_MAJOR_VERSION
+ VERSION_DATE
+ SINGULAR_VERSION
+ SING_UNAME
++SI_CPU_ARM
++SI_CPU_S390
+ SI_CPU_SPARC
+ SI_CPU_PPC
+ SI_CPU_IA64
+@@ -2685,6 +2687,20 @@ if test "$ac_cv_singuname" = ppcMac-darw
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
+ $as_echo "SI_CPU_PPC" >&6; }
+ fi
++if test "$ac_cv_singuname" = arm-Linux; then
++  $as_echo "#define SI_CPU_ARM 1" >>confdefs.h
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM" >&5
++$as_echo "SI_CPU_ARM" >&6; }
++fi
++if test "$ac_cv_singuname" = s390-Linux; then
++  $as_echo "#define SI_CPU_S390 1" >>confdefs.h
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_S390" >&5
++$as_echo "SI_CPU_S390" >&6; }
++fi
+ # test again with CPU names
+ if test "$ac_cv_singcpuname" = i386; then
+   $as_echo "#define SI_CPU_I386 1" >>confdefs.h
+@@ -2728,6 +2744,20 @@ if test "$ac_cv_singcpuname" = ppc; then
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_PPC" >&5
+ $as_echo "SI_CPU_PPC" >&6; }
+ fi
++if test "$ac_cv_singcpuname" = arm; then
++  $as_echo "#define SI_CPU_ARM 1" >>confdefs.h
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_ARM" >&5
++$as_echo "SI_CPU_ARM" >&6; }
++fi
++if test "$ac_cv_singcpuname" = s390; then
++  $as_echo "#define SI_CPU_S390 1" >>confdefs.h
++
++
++  { $as_echo "$as_me:${as_lineno-$LINENO}: result: SI_CPU_S390" >&5
++$as_echo "SI_CPU_S390" >&6; }
++fi
+ 
+ SING_UNAME=`echo $SINGUNAME | tr '-' '_' `
+ 
