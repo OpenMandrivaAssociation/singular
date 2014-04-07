@@ -282,7 +282,7 @@ pushd factory
 popd
 
 # kernel needs factory built
-make %{?_smp_mflags} CFLAGS="$CFLAGS -I%{_includedir}/c++/`gcc -dumpversion`/x86_64-mandriva-linux-gnu" -C kernel
+make %{?_smp_mflags} CFLAGS="$CFLAGS -I%{_includedir}/c++/`gcc -dumpversion` -I%{_includedir}/c++/`gcc -dumpversion`/x86_64-mandriva-linux-gnu" -C kernel
 
 # libfac needs factory built
 pushd libfac
