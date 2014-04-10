@@ -8,11 +8,11 @@
 # rebuilt, because each BRs the other and both are linked against the old
 # version of the library.  Use this to rebuild Singular without polymake
 # support, rebuild polymake, then build Singular again with polymake support.
-%bcond_with polymake
+%bcond_without polymake
 
 Name:		%{name}
 Version:	%(tr - . <<<%{upstreamver})
-Release:	9
+Release:	10
 Summary:	Computer Algebra System for polynomial computations
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
