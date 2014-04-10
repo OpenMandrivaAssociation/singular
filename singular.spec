@@ -25,7 +25,7 @@ BuildRequires:	dos2unix
 BuildRequires:	emacs
 BuildRequires:	flex
 BuildRequires:	flint-devel
-BuildRequires:	gmp-devel
+BuildRequires:	gmpxx-devel
 BuildRequires:	ncurses-devel
 BuildRequires:	ntl-devel
 %if %{with polymake}
