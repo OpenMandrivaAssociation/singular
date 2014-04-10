@@ -12,7 +12,7 @@
 
 Name:		%{name}
 Version:	%(tr - . <<<%{upstreamver})
-Release:	10
+Release:	11
 Summary:	Computer Algebra System for polynomial computations
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
@@ -92,6 +92,9 @@ Summary:	Singular development files
 Obsoletes:	%{old_libsingular_devel} < %{version}-%{release}
 Obsoletes:	%{old_libsingular_static} < %{version}-%{release}
 Provides:	%{old_libsingular_devel} = %{version}-%{release}
+Requires:	factory-devel
+Requires:	libfac-devel
+Requires:	%{name}%{?_isa} = %{version}-%{release}
 
 %description	devel
 This package contains the Singular development files.
