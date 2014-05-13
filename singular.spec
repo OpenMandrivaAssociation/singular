@@ -2,23 +2,21 @@
 %define		old_libsingular_devel	%mklibname %{name} -d
 %define		old_libsingular_static	%mklibname %{name} -d -s
 %global		singulardir		%{_libdir}/Singular
-%global		upstreamver		3-1-5
+%global		upstreamver		3-1-6
 
 # If a library used by both polymake and Singular is updated, neither can be
 # rebuilt, because each BRs the other and both are linked against the old
 # version of the library.  Use this to rebuild Singular without polymake
 # support, rebuild polymake, then build Singular again with polymake support.
-%bcond_without polymake
+%bcond_with polymake
 
 Name:		%{name}
 Version:	%(tr - . <<<%{upstreamver})
-Release:	11
+Release:	1
 Summary:	Computer Algebra System for polynomial computations
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/Singular-%{upstreamver}.tar.gz
-Source1:	singular.hlp
-Source2:	singular.idx
 URL:		http://www.singular.uni-kl.de/
 BuildRequires:	cddlib-devel
 BuildRequires:	dos2unix
@@ -57,21 +55,11 @@ Patch5:		Singular-builddid.patch
 # a shared library.
 Patch6:		Singular-undefined.patch
 
-# From sagemath singular-3-1-5.p0.spkg in "Upgrade Singular" trac
-# at http://trac.sagemath.org/sage_trac/ticket/13237
-Patch7:		NTL_negate.patch
-Patch8:		singular_trac_439.patch
-Patch9:		singular_trac_440.patch
-Patch10:	singular_trac_441.patch
-
 # Add missing #include directives in the semaphore code
 Patch11:	Singular-semaphore.patch
 # Adapt to new template code in NTL 6
 Patch12:	Singular-ntl6.patch
-# Support ARM and S390(x) architectures
-Patch13:	Singular-arches.patch
-# Adapt to changes in flint 2.4
-Patch14:	Singular-flint24.patch
+
 # Do not include c++ headers from C code
 Patch15:	Singular-cplusplus.patch
 
@@ -173,21 +161,14 @@ Emacs mode for Singular.
 %patch3 -p1 -b .link
 %patch4 -p1
 %patch5 -p1 -b .builddid
-%patch6 -p1 -b .undefined
-
-%patch7 -p1
-%patch8 -p1
-%patch9 -p1
-%patch10 -p1
+%patch6 -p1
 
 %patch11 -p1
 %patch12 -p1
-%patch13 -p1
-%patch14 -p1 -b .flint24
 
-%patch20 -p1 -b .M2_factory
-%patch21 -p1 -b .M2_memutil_debuggging
-%patch22 -p1 -b .M2_libfac
+#patch20 -p1 -b .M2_factory
+#patch21 -p1 -b .M2_memutil_debuggging
+#patch22 -p1 -b .M2_libfac
 
 sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
     -e "s|explicit_gftabledir=.*|explicit_gftabledir='%{singulardir}/LIB/gftables'|" \
@@ -226,9 +207,6 @@ sed -e 's/"S_UNAME"/Singular/' \
     -e 's,S_ROOT_DIR,"%{_libdir}",' \
     -i.orig kernel/feResource.cc
 touch -r kernel/feResource.cc.orig kernel/feResource.cc
-
-# TEMPORARY: Remove this once Singular ships an updated version
-cp -p %{SOURCE1} Singular/LIB
 
 %build
 export CFLAGS="%{optflags} -fPIC -fsigned-char -I%{_includedir}/cddlib -I%{_includedir}/flint"
@@ -345,7 +323,9 @@ mv $RPM_BUILD_ROOT%{_includedir}/{my,om}limits.h \
 # also installed in libdir
 rm -f $RPM_BUILD_ROOT%{_bindir}/*.so
 rm -f $RPM_BUILD_ROOT%{singulardir}/libsingular.so
+%if %{with polymake}
 rm -f $RPM_BUILD_ROOT%{singulardir}/polymake.so
+%endif
 
 # already linked to libsingular.so; do not distribute static libraries
 # or just compiled objects.
@@ -362,6 +342,7 @@ mkdir -p $RPM_BUILD_ROOT%{_bindir}
 cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
 #!/bin/sh
 
+module load surf-%{_arch}
 SINGULARPATH=%{singulardir} %{singulardir}/Singular-%{upstreamver} "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
@@ -370,6 +351,7 @@ chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
 cat > $RPM_BUILD_ROOT%{_bindir}/TSingular << EOF
 #!/bin/sh
 
+module load surf-geometry-%{_arch}
 %{singulardir}/TSingular --singular %{_bindir}/Singular "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/TSingular
@@ -381,6 +363,7 @@ chmod 644 $RPM_BUILD_ROOT%{singulardir}/LIB/*.lib
 cat > $RPM_BUILD_ROOT%{_bindir}/surfex << EOF
 #!/bin/sh
 
+module load surf-%{_arch}
 %{singulardir}/surfex %{singulardir}/LIB/surfex "\$@"
 EOF
 chmod +x $RPM_BUILD_ROOT%{_bindir}/surfex
@@ -438,7 +421,7 @@ pushd factory
     install -m 644 libcf.a $RPM_BUILD_ROOT%{_libdir}
     install -m 644 libcfmem.a $RPM_BUILD_ROOT%{_libdir}
     # automatically generated file at install time ignores includedir
-    sed	-e 's|<factory|<factory/factory|' \
+    sed        -e 's|<factory|<factory/factory|' \
 	-e 's|<templates/|<factory/templates/|' \
 	-i $RPM_BUILD_ROOT%{_includedir}/factory/templates/ftmpl_inst.cc
 popd

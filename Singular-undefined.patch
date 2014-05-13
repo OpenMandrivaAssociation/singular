@@ -1,18 +1,6 @@
-diff -up Singular-3-1-5/Singular/Makefile.in.undefined Singular-3-1-5/Singular/Makefile.in
---- Singular-3-1-5/Singular/Makefile.in.undefined	2014-03-10 13:38:35.942709805 -0500
-+++ Singular-3-1-5/Singular/Makefile.in	2014-03-10 13:41:07.350100104 -0500
-@@ -136,7 +136,7 @@ LIBSINGULAR_LIBS =-lsingfac -lsingcf -ln
- 
- SO_SUFFIX = so
- 
--LIBSINGULAR_FLAGS = -shared
-+LIBSINGULAR_FLAGS = -shared -Wl,--no-undefined
- LIBSINGULAR_LD = $(CXX)
- 
- # correct suffix for dynamic linking
-diff -up Singular-3-1-5/Singular/misc_ip.cc.undefined Singular-3-1-5/Singular/misc_ip.cc
---- Singular-3-1-5/Singular/misc_ip.cc.undefined	2012-07-12 09:24:57.000000000 -0500
-+++ Singular-3-1-5/Singular/misc_ip.cc	2014-03-10 13:38:35.945709773 -0500
+diff -up Singular-3-1-5/Singular/misc_ip.cc.orig Singular-3-1-5/Singular/misc_ip.cc
+--- Singular-3-1-5/Singular/misc_ip.cc.orig	2012-08-04 18:05:32.560226865 -0400
++++ Singular-3-1-5/Singular/misc_ip.cc	2012-08-04 18:05:53.430227597 -0400
 @@ -1169,7 +1169,6 @@ void siInit(char *name)
    errorreported = 0;
  }
@@ -26,9 +14,9 @@ diff -up Singular-3-1-5/Singular/misc_ip.cc.undefined Singular-3-1-5/Singular/mi
  }
  #endif
 -#endif
-diff -up Singular-3-1-5/Singular/tesths.cc.undefined Singular-3-1-5/Singular/tesths.cc
---- Singular-3-1-5/Singular/tesths.cc.undefined	2012-07-12 09:24:57.000000000 -0500
-+++ Singular-3-1-5/Singular/tesths.cc	2014-03-10 13:38:35.945709773 -0500
+diff -up Singular-3-1-5/Singular/tesths.cc.orig Singular-3-1-5/Singular/tesths.cc
+--- Singular-3-1-5/Singular/tesths.cc.orig	2012-08-04 18:06:02.832228022 -0400
++++ Singular-3-1-5/Singular/tesths.cc	2012-08-04 18:06:38.582229344 -0400
 @@ -52,27 +52,6 @@
  extern int siInit(char *);
  
