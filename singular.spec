@@ -420,10 +420,6 @@ pushd factory
     # do not run make install again, just install non singular factory files
     install -m 644 libcf.a $RPM_BUILD_ROOT%{_libdir}
     install -m 644 libcfmem.a $RPM_BUILD_ROOT%{_libdir}
-    # automatically generated file at install time ignores includedir
-    sed        -e 's|<factory|<factory/factory|' \
-	-e 's|<templates/|<factory/templates/|' \
-	-i $RPM_BUILD_ROOT%{_includedir}/factory/templates/ftmpl_inst.cc
 popd
 
 # incorrect factory includedir
