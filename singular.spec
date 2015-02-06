@@ -12,7 +12,7 @@
 
 Name:		%{name}
 Version:	%(tr - . <<<%{upstreamver})
-Release:	1
+Release:	2
 Summary:	Computer Algebra System for polynomial computations
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
