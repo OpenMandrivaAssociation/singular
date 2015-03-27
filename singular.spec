@@ -1,4 +1,3 @@
-%define		name			singular
 %define		old_libsingular_devel	%mklibname %{name} -d
 %define		old_libsingular_static	%mklibname %{name} -d -s
 %global		singulardir		%{_libdir}/Singular
@@ -10,13 +9,13 @@
 # support, rebuild polymake, then build Singular again with polymake support.
 %bcond_with polymake
 
-Name:		%{name}
-Version:	%(tr - . <<<%{upstreamver})
-Release:	2
+Name:		singular
+Version:	4.0.0
+Release:	1
 Summary:	Computer Algebra System for polynomial computations
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
-Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/Singular-%{upstreamver}.tar.gz
+Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/4-0-0/%{name}-%{version}.tar.gz
 URL:		http://www.singular.uni-kl.de/
 BuildRequires:	cddlib-devel
 BuildRequires:	dos2unix
@@ -88,7 +87,7 @@ Requires:	%{name}%{?_isa} = %{version}-%{release}
 This package contains the Singular development files.
 
 %package	-n factory-devel
-Summary:	C++ class library for multivariate polynomial data
+Summary:	C++++ class library for multivariate polynomial data
 Group:		Development/Other
 Requires:	gmp-devel
 Requires:	%{name} = %{version}-%{release}
@@ -291,8 +290,8 @@ make %{?_smp_mflags} -C Singular libparse
 
 %install
 make \
-	DESTDIR=$RPM_BUILD_ROOT \
-	install_prefix=$RPM_BUILD_ROOT%{singulardir} \
+	DESTDIR=%{buildroot} \
+	install_prefix=%{buildroot}%{singulardir} \
 	slibdir=%{singulardir}/LIB \
 	install \
 	install-libsingular \
@@ -300,8 +299,8 @@ make \
 
 # dup gftables data
 GF_DIR=%{_datadir}/factory/gftables
-mkdir -p $RPM_BUILD_ROOT${GF_DIR}
-pushd $RPM_BUILD_ROOT%{singulardir}/LIB/gftables
+mkdir -p %{buildroot}${GF_DIR}
+pushd %{buildroot}%{singulardir}/LIB/gftables
 for file in * ; do
  new_file="gftable.$(head -2 ${file} | tail -1 | cut -d' ' -f1,2 | sed -e 's| |.|')"
  ## absolute
@@ -314,93 +313,93 @@ done
 popd
 
 # does not need to be in top directory
-mkdir $RPM_BUILD_ROOT%{_includedir}/gfanlib
-mv $RPM_BUILD_ROOT%{_includedir}/gfanlib*.h \
-    $RPM_BUILD_ROOT%{_includedir}/gfanlib
-mv $RPM_BUILD_ROOT%{_includedir}/{my,om}limits.h \
-    $RPM_BUILD_ROOT%{_includedir}/singular
+mkdir %{buildroot}%{_includedir}/gfanlib
+mv %{buildroot}%{_includedir}/gfanlib*.h \
+    %{buildroot}%{_includedir}/gfanlib
+mv %{buildroot}%{_includedir}/{my,om}limits.h \
+    %{buildroot}%{_includedir}/singular
 
 # also installed in libdir
-rm -f $RPM_BUILD_ROOT%{_bindir}/*.so
-rm -f $RPM_BUILD_ROOT%{singulardir}/libsingular.so
+rm -f %{buildroot}%{_bindir}/*.so
+rm -f %{buildroot}%{singulardir}/libsingular.so
 %if %{with polymake}
-rm -f $RPM_BUILD_ROOT%{singulardir}/polymake.so
+rm -f %{buildroot}%{singulardir}/polymake.so
 %endif
 
 # already linked to libsingular.so; do not distribute static libraries
 # or just compiled objects.
-rm -f $RPM_BUILD_ROOT%{_libdir}/*.a $RPM_BUILD_ROOT%{_libdir}/*.o
+rm -f %{buildroot}%{_libdir}/*.a %{buildroot}%{_libdir}/*.o
 
 # avoid poluting libdir with dynamic modules
-pushd $RPM_BUILD_ROOT%{_libdir}
+pushd %{buildroot}%{_libdir}
     mkdir -p Singular
     mv dbmsr.so p_Procs*.so Singular
 popd
 
 # create a script also setting SINGULARPATH
-mkdir -p $RPM_BUILD_ROOT%{_bindir}
-cat > $RPM_BUILD_ROOT%{_bindir}/Singular << EOF
+mkdir -p %{buildroot}%{_bindir}
+cat > %{buildroot}%{_bindir}/Singular << EOF
 #!/bin/sh
 
 module load surf-%{_arch}
 SINGULARPATH=%{singulardir} %{singulardir}/Singular-%{upstreamver} "\$@"
 EOF
-chmod +x $RPM_BUILD_ROOT%{_bindir}/Singular
+chmod +x %{buildroot}%{_bindir}/Singular
 
 # TSingular
-cat > $RPM_BUILD_ROOT%{_bindir}/TSingular << EOF
+cat > %{buildroot}%{_bindir}/TSingular << EOF
 #!/bin/sh
 
 module load surf-geometry-%{_arch}
 %{singulardir}/TSingular --singular %{_bindir}/Singular "\$@"
 EOF
-chmod +x $RPM_BUILD_ROOT%{_bindir}/TSingular
+chmod +x %{buildroot}%{_bindir}/TSingular
 
 # remove some wrong executable permissions
-chmod 644 $RPM_BUILD_ROOT%{singulardir}/LIB/*.lib
+chmod 644 %{buildroot}%{singulardir}/LIB/*.lib
 
 # surfex
-cat > $RPM_BUILD_ROOT%{_bindir}/surfex << EOF
+cat > %{buildroot}%{_bindir}/surfex << EOF
 #!/bin/sh
 
 module load surf-%{_arch}
 %{singulardir}/surfex %{singulardir}/LIB/surfex "\$@"
 EOF
-chmod +x $RPM_BUILD_ROOT%{_bindir}/surfex
-mkdir -p $RPM_BUILD_ROOT%{singulardir}/LIB/surfex/doc
+chmod +x %{buildroot}%{_bindir}/surfex
+mkdir -p %{buildroot}%{singulardir}/LIB/surfex/doc
 install -m644 Singular/LIB/surfex/doc/surfex_doc_linux.pdf \
-    $RPM_BUILD_ROOT%{singulardir}/LIB/surfex/doc/surfex_doc_linux.pdf
+    %{buildroot}%{singulardir}/LIB/surfex/doc/surfex_doc_linux.pdf
 
 # referenced in xemacs setup
-install -m644 emacs/singular.xpm $RPM_BUILD_ROOT%{_lispdir}/singular
+install -m644 emacs/singular.xpm %{buildroot}%{_lispdir}/singular
 
 # remove suggested preferences
-rm -f $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-general
+rm -f %{buildroot}%{_lispdir}/singular/.emacs-general
 
 # emacs autostart
 sed -i "s|<your-singular-emacs-home-directory>|%{_ispdir}/singular|" \
-    $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-singular
-mv $RPM_BUILD_ROOT%{_lispdir}/singular/.emacs-singular \
-     $RPM_BUILD_ROOT%{_lispdir}/singular-init.el
+    %{buildroot}%{_lispdir}/singular/.emacs-singular
+mv %{buildroot}%{_lispdir}/singular/.emacs-singular \
+     %{buildroot}%{_lispdir}/singular-init.el
 
 # ESingular
-cat > $RPM_BUILD_ROOT%{_bindir}/ESingular << EOF
+cat > %{buildroot}%{_bindir}/ESingular << EOF
 #!/bin/sh
 
 export ESINGULAR_EMACS_LOAD=%{_emacs_sitestartdir}/singular-init.el
 export ESINGULAR_EMACS_DIR=%{_lispdir}/singular
 %{singulardir}/ESingular --singular %{_bindir}/Singular "\$@"
 EOF
-chmod +x $RPM_BUILD_ROOT%{_bindir}/ESingular
+chmod +x %{buildroot}%{_bindir}/ESingular
 
 pushd libfac
-    make DESTDIR=$RPM_BUILD_ROOT install
+    make DESTDIR=%{buildroot} install
     # not installed by default
-    install -m 644 libfac.a $RPM_BUILD_ROOT%{_libdir}/libfac.a
+    install -m 644 libfac.a %{buildroot}%{_libdir}/libfac.a
 popd
 
 pushd factory
-    make DESTDIR=$RPM_BUILD_ROOT install
+    make DESTDIR=%{buildroot} install
 # make a version without singular defined
     make clean
 %configure \
@@ -418,15 +417,15 @@ pushd factory
     # not built by default
     make libcfmem.a
     # do not run make install again, just install non singular factory files
-    install -m 644 libcf.a $RPM_BUILD_ROOT%{_libdir}
-    install -m 644 libcfmem.a $RPM_BUILD_ROOT%{_libdir}
+    install -m 644 libcf.a %{buildroot}%{_libdir}
+    install -m 644 libcfmem.a %{buildroot}%{_libdir}
 popd
 
 # incorrect factory includedir
 sed -e 's|<\(cf_gmp.h>\)|<factory/\1|' \
-    -i $RPM_BUILD_ROOT%{_includedir}/singular/si_gmp.h
+    -i %{buildroot}%{_includedir}/singular/si_gmp.h
 
-dos2unix $RPM_BUILD_ROOT%{singulardir}/LIB/*.lib
+dos2unix %{buildroot}%{singulardir}/LIB/*.lib
 
 %files
 %{_bindir}/Singular
