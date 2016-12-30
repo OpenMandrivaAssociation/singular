@@ -1,16 +1,16 @@
-diff -up Singular-3-1-5/Singular/Makefile.in.orig Singular-3-1-5/Singular/Makefile.in
---- Singular-3-1-5/Singular/Makefile.in.orig	2013-08-16 12:04:36.573104279 -0300
-+++ Singular-3-1-5/Singular/Makefile.in	2013-08-16 12:03:27.957101652 -0300
-@@ -132,7 +132,7 @@ HAVE_MPSR       = @HAVE_MPSR@
+diff -up Singular-3-1-7/Singular/Makefile.in.orig Singular-3-1-7/Singular/Makefile.in
+--- Singular-3-1-7/Singular/Makefile.in.orig	2016-02-15 21:07:59.903073250 -0700
++++ Singular-3-1-7/Singular/Makefile.in	2016-02-15 21:16:53.916992781 -0700
+@@ -140,7 +140,7 @@ HAVE_MPSR       = @HAVE_MPSR@
  #
  # Handle libSINGULAR stuff
  #
--LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc
-+LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline -lgmp -lomalloc -lpthread -ldl
+-LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline @FLINT_LIBS@ -lgmp -lomalloc
++LIBSINGULAR_LIBS =-lsingfac -lsingcf -lntl -lreadline @FLINT_LIBS@ -lgmp -lomalloc -lpthread -ldl
  
  SO_SUFFIX = so
  
-@@ -380,13 +380,13 @@ Singular${S_EXT}: mod2.h Makefile versio
+@@ -388,13 +388,13 @@ Singular${S_EXT}: mod2.h Makefile versio
  	${CXX} ${CXXFLAGS} ${CPPFLAGS} ${CXXTEMPLFLAGS} ${DEFS} \
  	  -o Singular${S_EXT} \
  	  tesths.cc iparith.o mpsr_Tok.o claptmpl.o\
@@ -22,11 +22,11 @@ diff -up Singular-3-1-5/Singular/Makefile.in.orig Singular-3-1-5/Singular/Makefi
  	$(LIBSINGULAR_LD) ${SLDFLAGS} ${LIBSINGULAR_FLAGS} -o libsingular.${SO_SUFFIX} \
  	iparith.o mpsr_Tok.o claptmpl.o \
 -	${OBJS} -lkernel -L../kernel -L../factory -L../libfac -L${libdir} ${LIBSINGULAR_LIBS}
-+	${OBJS}  -L../kernel -L../factory -L../libfac -L../omalloc -lkernel -L${libdir} ${LIBSINGULAR_LIBS}
++	${OBJS} -L../kernel -L../factory -L../libfac -L../omalloc -lkernel -L${libdir} ${LIBSINGULAR_LIBS}
  
  libsingular.a: mod2.h Makefile version.h $(WIN_LIBS) scanner.cc  ${OBJS} \
           iparith.o libparse.cc claptmpl.o mpsr_Tok.o
-@@ -437,7 +437,7 @@ version.h: ${SOURCES} ${HEADERS} Makefil
+@@ -445,7 +445,7 @@ version.h: ${SOURCES} ${HEADERS} Makefil
  	echo "#define CXX \"" ${CXX} ${CXXFLAGS} ${DEFS} "\"" >>version.h
  
  libparse: libparse_main.o utils.o
@@ -35,7 +35,7 @@ diff -up Singular-3-1-5/Singular/Makefile.in.orig Singular-3-1-5/Singular/Makefi
  
  libparse_main.o: libparse.cc
  	${CXX} ${CPPFLAGS} -c -o libparse_main.o libparse.cc  -DSTANDALONE_PARSER
-@@ -458,12 +458,12 @@ libparse.cc: libparse.l
+@@ -466,12 +466,12 @@ libparse.cc: libparse.l
  ESingular: mod2.h feOpt.cc version.h emacs.cc \
             feOptES.inc
  	${CXX} -O2 ${CPPFLAGS} ${DEFS} -DESINGULAR -DPROTO -o ESingular emacs.cc ../kernel/fegetopt.o \

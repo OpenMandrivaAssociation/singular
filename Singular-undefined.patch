@@ -1,7 +1,19 @@
-diff -up Singular-3-1-5/Singular/misc_ip.cc.orig Singular-3-1-5/Singular/misc_ip.cc
---- Singular-3-1-5/Singular/misc_ip.cc.orig	2012-08-04 18:05:32.560226865 -0400
-+++ Singular-3-1-5/Singular/misc_ip.cc	2012-08-04 18:05:53.430227597 -0400
-@@ -1169,7 +1169,6 @@ void siInit(char *name)
+diff -up Singular-3-1-7/Singular/Makefile.in.undefined Singular-3-1-7/Singular/Makefile.in
+--- Singular-3-1-7/Singular/Makefile.in.undefined	2016-02-15 21:28:04.755898679 -0700
++++ Singular-3-1-7/Singular/Makefile.in	2016-02-15 21:31:11.347859890 -0700
+@@ -144,7 +144,7 @@ LIBSINGULAR_LIBS =-lsingfac -lsingcf -ln
+ 
+ SO_SUFFIX = so
+ 
+-LIBSINGULAR_FLAGS = -shared
++LIBSINGULAR_FLAGS = -shared -Wl,--no-undefined
+ LIBSINGULAR_LD = $(CXX)
+ 
+ # correct suffix for dynamic linking
+diff -up Singular-3-1-7/Singular/misc_ip.cc.undefined Singular-3-1-7/Singular/misc_ip.cc
+--- Singular-3-1-7/Singular/misc_ip.cc.undefined	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/Singular/misc_ip.cc	2016-02-15 21:31:11.349859729 -0700
+@@ -1269,7 +1269,6 @@ void siInit(char *name)
    errorreported = 0;
  }
  
@@ -9,19 +21,19 @@ diff -up Singular-3-1-5/Singular/misc_ip.cc.orig Singular-3-1-5/Singular/misc_ip
  #ifdef HAVE_FACTORY
  // the init routines of factory need mmInit
  int mmInit( void )
-@@ -1177,4 +1176,3 @@ int mmInit( void )
+@@ -1277,4 +1276,3 @@ int mmInit( void )
    return 1;
  }
  #endif
 -#endif
-diff -up Singular-3-1-5/Singular/tesths.cc.orig Singular-3-1-5/Singular/tesths.cc
---- Singular-3-1-5/Singular/tesths.cc.orig	2012-08-04 18:06:02.832228022 -0400
-+++ Singular-3-1-5/Singular/tesths.cc	2012-08-04 18:06:38.582229344 -0400
-@@ -52,27 +52,6 @@
+diff -up Singular-3-1-7/Singular/tesths.cc.undefined Singular-3-1-7/Singular/tesths.cc
+--- Singular-3-1-7/Singular/tesths.cc.undefined	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/Singular/tesths.cc	2016-02-15 21:32:47.063145511 -0700
+@@ -51,23 +51,6 @@
  extern int siInit(char *);
  
  #if ! defined(LIBSINGULAR)
--int mmInit2( void )
+-static int mmInit2( void )
 -{
 -#if defined(OMALLOC_USES_MALLOC) || defined(X_OMALLOC)
 -    /* in mmstd.c, for some architectures freeSize() unconditionally uses the *system* free() */
@@ -35,11 +47,7 @@ diff -up Singular-3-1-5/Singular/tesths.cc.orig Singular-3-1-5/Singular/tesths.c
 -}
 -int mmInit( void )
 -{
--#ifndef SI_THREADS
 -  return mmInit2();
--#else
--  return 1;
--#endif
 -}
 -
  /*0 implementation*/

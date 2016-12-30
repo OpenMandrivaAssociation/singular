@@ -1,6 +1,6 @@
-diff -up Singular-3-1-5/Singular/semaphore.c.orig Singular-3-1-5/Singular/semaphore.c
---- Singular-3-1-5/Singular/semaphore.c.orig	2012-12-19 14:01:16.000000000 -0700
-+++ Singular-3-1-5/Singular/semaphore.c	2013-05-02 08:53:05.707047549 -0600
+diff -up Singular-3-1-7/Singular/semaphore.c.orig Singular-3-1-7/Singular/semaphore.c
+--- Singular-3-1-7/Singular/semaphore.c.orig	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/Singular/semaphore.c	2016-02-15 21:36:08.138939362 -0700
 @@ -4,6 +4,8 @@
  #include <sys/stat.h>
  #include <stdio.h>
@@ -8,5 +8,5 @@ diff -up Singular-3-1-5/Singular/semaphore.c.orig Singular-3-1-5/Singular/semaph
 +#include <string.h>
 +#include <unistd.h>
  #include <Singular/mod2.h>
- 
- #ifdef HAVE_SIMPLEIPC
+ #include <Singular/cntrlc.h>
+ #include <Singular/si_signals.h>

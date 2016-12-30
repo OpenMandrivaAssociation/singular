@@ -2,7 +2,10 @@
 %define		old_libsingular_devel	%mklibname %{name} -d
 %define		old_libsingular_static	%mklibname %{name} -d -s
 %global		singulardir		%{_libdir}/Singular
-%global		upstreamver		3-1-6
+%global		upstreamver		3-1-7
+
+%define		_disable_lto 1
+%define		_disable_ld_no_undefined 1
 
 # If a library used by both polymake and Singular is updated, neither can be
 # rebuilt, because each BRs the other and both are linked against the old
@@ -57,8 +60,8 @@ Patch6:		Singular-undefined.patch
 
 # Add missing #include directives in the semaphore code
 Patch11:	Singular-semaphore.patch
-# Adapt to new template code in NTL 6
-Patch12:	Singular-ntl6.patch
+# Adapt to new template code in NTL 8
+Patch12:	Singular-ntl8.patch
 
 # Do not include c++ headers from C code
 Patch15:	Singular-cplusplus.patch
@@ -175,8 +178,7 @@ sed -i -e "s|gftabledir=.*|gftabledir='%{singulardir}/LIB/gftables'|"	\
     factory/configure.in factory/configure
 
 # Build the debug libfactory with the right CFLAGS
-sed -i 's/\($(CPPFLAGS)\) \($(FLINT_CFLAGS)\)/\1 $(CFLAGS) \2/' \
-    factory/GNUmakefile.in
+sed -i '/FLINT/s/\($(CPPFLAGS)\)$/\1 $(CFLAGS)/' factory/GNUmakefile.in
 
 # Build the debug kernel with the right CFLAGS
 sed -ri 's/(C(XX)?FLAGS)(.*= )-g/\1\3$(\1)/' kernel/Makefile.in
@@ -209,7 +211,9 @@ sed -e 's/"S_UNAME"/Singular/' \
 touch -r kernel/feResource.cc.orig kernel/feResource.cc
 
 %build
-export CFLAGS="%{optflags} -fPIC -fsigned-char -I%{_includedir}/cddlib -I%{_includedir}/flint"
+export CC=gcc
+export CXX=g++
+export CFLAGS="%{optflags} -fPIC -fsigned-char -fno-delete-null-pointer-checks -I%{_includedir}/cddlib -I%{_includedir}/flint"
 export CXXFLAGS=$CFLAGS
 export LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
 export LIBS="-lpthread -ldl"
@@ -251,6 +255,11 @@ make %{?_smp_mflags} -C gfanlib
 %endif
 
 pushd factory
+CFLAGS="%{optflags} -fPIC -fsigned-char -fno-delete-null-pointer-checks -I%{_includedir}/cddlib -I%{_includedir}/flint"
+CXXFLAGS=$CFLAGS
+LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
+LIBS="-lpthread -ldl"
+
 %configure \
 	--bindir=%{singulardir} \
 	--includedir=%{_includedir}/factory \
@@ -336,6 +345,9 @@ pushd $RPM_BUILD_ROOT%{_libdir}
     mkdir -p Singular
     mv dbmsr.so p_Procs*.so Singular
 popd
+
+# remove script that calls surf; we don't ship it
+rm -f $RPM_BUILD_ROOT%{singulardir}/singularsurf
 
 # create a script also setting SINGULARPATH
 mkdir -p $RPM_BUILD_ROOT%{_bindir}

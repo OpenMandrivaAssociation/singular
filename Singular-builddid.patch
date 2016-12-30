@@ -1,6 +1,6 @@
-diff -up Singular-3-1-6/kernel/Makefile.in.builddid Singular-3-1-6/kernel/Makefile.in
---- Singular-3-1-6/kernel/Makefile.in.builddid	2014-01-17 08:42:37.564086425 -0600
-+++ Singular-3-1-6/kernel/Makefile.in	2014-01-17 08:42:37.574086316 -0600
+diff -up Singular-3-1-7/kernel/Makefile.in.builddid Singular-3-1-7/kernel/Makefile.in
+--- Singular-3-1-7/kernel/Makefile.in.builddid	2016-02-15 21:06:08.429066185 -0700
++++ Singular-3-1-7/kernel/Makefile.in	2016-02-15 21:28:04.753898841 -0700
 @@ -264,7 +264,7 @@ p_Procs_Dynamic.inc: p_Procs_Generate.cc
  	-rm -f p_Procs_Dynamic p_Procs_Dynamic.exe
  
@@ -19,10 +19,10 @@ diff -up Singular-3-1-6/kernel/Makefile.in.builddid Singular-3-1-6/kernel/Makefi
  
  p_Procs_Lib_%.dl_og : p_Procs_Lib.cc  p_Procs_Dynamic.og
  	${CXXG} ${CXXFLAGSG} ${CXXTEMPLFLAGS} ${CPPFLAGS} ${DEFSG} ${SFLAGS} -Dp_Procs_$* -c $< -o $@
-diff -up Singular-3-1-6/Singular/Makefile.in.builddid Singular-3-1-6/Singular/Makefile.in
---- Singular-3-1-6/Singular/Makefile.in.builddid	2014-01-17 08:42:37.574086316 -0600
-+++ Singular-3-1-6/Singular/Makefile.in	2014-01-17 08:43:25.953560965 -0600
-@@ -489,10 +489,10 @@ feOptTS.inc: feOpt.cc mod2.h
+diff -up Singular-3-1-7/Singular/Makefile.in.builddid Singular-3-1-7/Singular/Makefile.in
+--- Singular-3-1-7/Singular/Makefile.in.builddid	2016-02-15 21:16:53.916992781 -0700
++++ Singular-3-1-7/Singular/Makefile.in	2016-02-15 21:28:04.755898679 -0700
+@@ -492,10 +492,10 @@ feOptTS.inc: feOpt.cc mod2.h
  	rm -f feOptTS feOptTS.exe
  
  mpsr.so: $(MPSR_SOURCES:.cc=.dl_o)
@@ -34,4 +34,4 @@ diff -up Singular-3-1-6/Singular/Makefile.in.builddid Singular-3-1-6/Singular/Ma
 +	$(LIBSINGULAR_LD) ${SLDFLAGS} -o $@ $^ ${GLIBC_DYN_FIX}
  
  # dynamic module for python bject support
- MOD/pyobject.${MODULE_SUFFIX}: pyobject.dl_o
+ ${dir_mod}/pyobject.${MODULE_SUFFIX}: pyobject.dl_o

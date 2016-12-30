@@ -1,6 +1,6 @@
-diff -up Singular-3-1-6/doc/Makefile.in.destdir Singular-3-1-6/doc/Makefile.in
---- Singular-3-1-6/doc/Makefile.in.destdir	2012-12-19 15:01:16.000000000 -0600
-+++ Singular-3-1-6/doc/Makefile.in	2014-03-10 09:48:46.353968370 -0500
+diff -up Singular-3-1-7/doc/Makefile.in.destdir Singular-3-1-7/doc/Makefile.in
+--- Singular-3-1-7/doc/Makefile.in.destdir	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/doc/Makefile.in	2016-02-15 20:50:21.520456080 -0700
 @@ -68,7 +68,7 @@ EX_SUBDIR       = ./examples
  CHKSUM_DB       = ${DOC_SUBDIR}/chksum
  DOC2TEX_EXAMPLE_EXCLUSIONS = @DOC2TEX_EXAMPLE_EXCLUSIONS@
@@ -10,10 +10,10 @@ diff -up Singular-3-1-6/doc/Makefile.in.destdir Singular-3-1-6/doc/Makefile.in
  		  -exdir ${EX_SUBDIR} ${DOC2TEX_EXAMPLE_EXCLUSIONS}
  TAG		=
  PL2DOC		= ${PERL} ./pl2doc.pl ${TAG} -db ${CHKSUM_DB}
-diff -up Singular-3-1-6/factory/GNUmakefile.in.destdir Singular-3-1-6/factory/GNUmakefile.in
---- Singular-3-1-6/factory/GNUmakefile.in.destdir	2012-12-19 15:01:16.000000000 -0600
-+++ Singular-3-1-6/factory/GNUmakefile.in	2014-03-10 09:48:46.354968360 -0500
-@@ -530,43 +530,43 @@ installtest:	test_install
+diff -up Singular-3-1-7/factory/GNUmakefile.in.destdir Singular-3-1-7/factory/GNUmakefile.in
+--- Singular-3-1-7/factory/GNUmakefile.in.destdir	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/factory/GNUmakefile.in	2016-02-15 20:53:44.653068777 -0700
+@@ -535,44 +535,44 @@ installtest:	test_install
  install install-libsingular:	$(installtargets) cf_gmp.h
  
  install_all:    install libsingcf_p.a 
@@ -25,23 +25,25 @@ diff -up Singular-3-1-6/factory/GNUmakefile.in.destdir Singular-3-1-6/factory/GN
  installcf:	cf
 -		$(MKINSTALLDIRS) $(libdir)
 -		$(MKINSTALLDIRS) $(includedir)
+-		$(MKINSTALLDIRS) $(includedir)/factory
 -		$(INSTALL_DATA) $(libfactory) $(libdir)/$(libfactory)
 -		-$(INSTALL_DATA) libsingcf_g.a $(libdir)/libsingcf_g.a
 -		-$(INSTALL_DATA) libsingcf_p.a $(libdir)/libsingcf_p.a
--		$(INSTALL_DATA) factory.h $(includedir)/factory.h
--		$(INSTALL_DATA) cf_gmp.h $(includedir)/cf_gmp.h
--		$(INSTALL_DATA) factoryconf.h $(includedir)/factoryconf.h
+-		$(INSTALL_DATA) factory.h $(includedir)/factory/factory.h
+-		$(INSTALL_DATA) cf_gmp.h $(includedir)/factory/cf_gmp.h
+-		$(INSTALL_DATA) factoryconf.h $(includedir)/factory/factoryconf.h
 +		$(MKINSTALLDIRS) $(DESTDIR)$(libdir)
 +		$(MKINSTALLDIRS) $(DESTDIR)$(includedir)
++		$(MKINSTALLDIRS) $(DESTDIR)$(includedir)/factory
 +		$(INSTALL_DATA) $(libfactory) $(DESTDIR)$(libdir)/$(libfactory)
 +		-$(INSTALL_DATA) libsingcf_g.a $(DESTDIR)$(libdir)/libsingcf_g.a
 +		-$(INSTALL_DATA) libsingcf_p.a $(DESTDIR)$(libdir)/libsingcf_p.a
-+		$(INSTALL_DATA) factory.h $(DESTDIR)$(includedir)/factory.h
-+		$(INSTALL_DATA) cf_gmp.h $(DESTDIR)$(includedir)/cf_gmp.h
-+		$(INSTALL_DATA) factoryconf.h $(DESTDIR)$(includedir)/factoryconf.h
- 		for file in $(templateincl); do \
--		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(templatedir)/$$file; \
-+		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(DESTDIR)$(templatedir)/$$file; \
++		$(INSTALL_DATA) factory.h $(DESTDIR)$(includedir)/factory/factory.h
++		$(INSTALL_DATA) cf_gmp.h $(DESTDIR)$(includedir)/factory/cf_gmp.h
++		$(INSTALL_DATA) factoryconf.h $(DESTDIR)$(includedir)/factory/factoryconf.h
+ 		for file in $(templateincl) ${templatesrc}; do \
+-		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(includedir)/factory/templates/$$file; \
++		  $(INSTALL_DATA) $(srcdir)/templates/$$file $(DESTDIR)$(includedir)/factory/templates/$$file; \
  		done
  # we run `ranlib' another time for SUN machines
 -		$(RANLIB) $(libdir)/$(libfactory)
@@ -75,9 +77,9 @@ diff -up Singular-3-1-6/factory/GNUmakefile.in.destdir Singular-3-1-6/factory/GN
  		  done \
  		else \
  		  echo "Run 'make gftables' before installing them"; \
-diff -up Singular-3-1-6/IntegerProgramming/Makefile.in.destdir Singular-3-1-6/IntegerProgramming/Makefile.in
---- Singular-3-1-6/IntegerProgramming/Makefile.in.destdir	2012-12-19 15:01:16.000000000 -0600
-+++ Singular-3-1-6/IntegerProgramming/Makefile.in	2014-03-10 09:48:46.354968360 -0500
+diff -up Singular-3-1-7/IntegerProgramming/Makefile.in.destdir Singular-3-1-7/IntegerProgramming/Makefile.in
+--- Singular-3-1-7/IntegerProgramming/Makefile.in.destdir	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/IntegerProgramming/Makefile.in	2016-02-15 20:50:21.527455516 -0700
 @@ -63,12 +63,12 @@ install-nolns: install
  install_all: install
  
@@ -97,9 +99,9 @@ diff -up Singular-3-1-6/IntegerProgramming/Makefile.in.destdir Singular-3-1-6/In
  
  install-bindist: $(MAIN1) $(MAIN2) $(MAIN3) $(MAIN4)
  	${MKINSTALLDIRS} ${install_bindir}
-diff -up Singular-3-1-6/kernel/Makefile.in.destdir Singular-3-1-6/kernel/Makefile.in
---- Singular-3-1-6/kernel/Makefile.in.destdir	2012-12-19 15:01:16.000000000 -0600
-+++ Singular-3-1-6/kernel/Makefile.in	2014-03-10 09:48:46.354968360 -0500
+diff -up Singular-3-1-7/kernel/Makefile.in.destdir Singular-3-1-7/kernel/Makefile.in
+--- Singular-3-1-7/kernel/Makefile.in.destdir	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/kernel/Makefile.in	2016-02-15 20:50:21.528455435 -0700
 @@ -272,9 +272,9 @@ p_Procs_%.so: p_Procs_Lib_%.dl_o
  install-nolns: install
  
@@ -141,9 +143,9 @@ diff -up Singular-3-1-6/kernel/Makefile.in.destdir Singular-3-1-6/kernel/Makefil
  endif
  
  ##
-diff -up Singular-3-1-6/libfac/Makefile.in.destdir Singular-3-1-6/libfac/Makefile.in
---- Singular-3-1-6/libfac/Makefile.in.destdir	2012-12-19 15:01:16.000000000 -0600
-+++ Singular-3-1-6/libfac/Makefile.in	2014-03-10 09:48:46.354968360 -0500
+diff -up Singular-3-1-7/libfac/Makefile.in.destdir Singular-3-1-7/libfac/Makefile.in
+--- Singular-3-1-7/libfac/Makefile.in.destdir	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/libfac/Makefile.in	2016-02-15 20:50:21.528455435 -0700
 @@ -146,17 +146,17 @@ libsingfac_p.a:	$(PROFOBJ)
  install-nolns: install
  
@@ -171,9 +173,9 @@ diff -up Singular-3-1-6/libfac/Makefile.in.destdir Singular-3-1-6/libfac/Makefil
  
  uninstall: 
  	$(RM) ${includedir}/${LIBFACINCLUDE}
-diff -up Singular-3-1-6/omalloc/Makefile.in.destdir Singular-3-1-6/omalloc/Makefile.in
---- Singular-3-1-6/omalloc/Makefile.in.destdir	2012-12-19 15:01:16.000000000 -0600
-+++ Singular-3-1-6/omalloc/Makefile.in	2014-03-10 09:48:46.355968349 -0500
+diff -up Singular-3-1-7/omalloc/Makefile.in.destdir Singular-3-1-7/omalloc/Makefile.in
+--- Singular-3-1-7/omalloc/Makefile.in.destdir	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/omalloc/Makefile.in	2016-02-15 20:50:21.529455354 -0700
 @@ -181,35 +181,35 @@ configure: configure.in
  install-nolns: install
  
@@ -233,10 +235,10 @@ diff -up Singular-3-1-6/omalloc/Makefile.in.destdir Singular-3-1-6/omalloc/Makef
  
  uninstall:
  	rm -f $(includedir)/omalloc.h
-diff -up Singular-3-1-6/Singular/Makefile.in.destdir Singular-3-1-6/Singular/Makefile.in
---- Singular-3-1-6/Singular/Makefile.in.destdir	2012-12-19 15:01:16.000000000 -0600
-+++ Singular-3-1-6/Singular/Makefile.in	2014-03-10 09:49:43.986351393 -0500
-@@ -562,57 +562,58 @@ install_all: install
+diff -up Singular-3-1-7/Singular/Makefile.in.destdir Singular-3-1-7/Singular/Makefile.in
+--- Singular-3-1-7/Singular/Makefile.in.destdir	2014-08-06 09:59:15.000000000 -0600
++++ Singular-3-1-7/Singular/Makefile.in	2016-02-15 20:58:01.359359527 -0700
+@@ -565,58 +565,58 @@ install_all: install
  install-nolns: all installbin-nolns installslib-nolns
  
  installbin: ${SING_EXEC} libparse ESingular TSingular ${RUN_SINGULARS}
@@ -248,16 +250,18 @@ diff -up Singular-3-1-6/Singular/Makefile.in.destdir Singular-3-1-6/Singular/Mak
 -	  ${INSTALL_PROGRAM} $$file ${bindir}; \
 +	  ${INSTALL_PROGRAM} $$file $(DESTDIR)${bindir}; \
  	done
- 	-for file in MOD/*.so; do \
--	  ${INSTALL_PROGRAM} $$file ${bindir}/MOD; \
-+	  ${INSTALL_PROGRAM} $$file $(DESTDIR)${bindir}/MOD; \
+ 	-for file in ${pattern_mod}; do \
+-	  ${INSTALL_PROGRAM} $$file ${bindir_mod}; \
++	  ${INSTALL_PROGRAM} $$file $(DESTDIR)${bindir_mod}; \
  	done
+-	${INSTALL_PROGRAM} singularsurf ${RUN_SINGULARS} ${bindir}
 -	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 -	${INSTALL_PROGRAM} ESingular TSingular ${bindir}
 -	${INSTALL_PROGRAM} surfex ${bindir}
 -	chmod a+x ${SINGULAR}
 -	rm -f ${bindir}/${SING_EXEC}${EXEC_EXT}
 -	cd ${bindir}; ${LN_S} ${SINGULAR} Singular${EXEC_EXT};
++	${INSTALL_PROGRAM} singularsurf ${RUN_SINGULARS} $(DESTDIR)${bindir}
 +	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} $(DESTDIR)${bindir}
 +	${INSTALL_PROGRAM} ESingular TSingular $(DESTDIR)${bindir}
 +	${INSTALL_PROGRAM} surfex $(DESTDIR)${bindir}
@@ -274,9 +278,9 @@ diff -up Singular-3-1-6/Singular/Makefile.in.destdir Singular-3-1-6/Singular/Mak
 -	  ${INSTALL_PROGRAM} $$file ${bindir}; \
 +	  ${INSTALL_PROGRAM} $$file $(DESTDIR)${bindir}; \
  	done
- 	-for file in MOD/*.so; do \
--	  ${INSTALL_PROGRAM} $$file ${bindir}/MOD; \
-+	  ${INSTALL_PROGRAM} $$file $(DESTDIR)${bindir}/MOD; \
+ 	-for file in ${pattern_mod}; do \
+-	  ${INSTALL_PROGRAM} $$file ${bindir_mod}; \
++	  ${INSTALL_PROGRAM} $$file $(DESTDIR)${bindir_mod}; \
  	done
 -	${INSTALL_PROGRAM} libparse ${RUN_SINGULARS} ${bindir}
 -	${INSTALL_PROGRAM} ESingular TSingular ${DL_LIBS} ${bindir}
@@ -292,7 +296,6 @@ diff -up Singular-3-1-6/Singular/Makefile.in.destdir Singular-3-1-6/Singular/Mak
  installslib: LIB
 -	test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
 +	#test -r ${slibdir} || ${LN_S} `pwd`/LIB ${slibdir}
-+	:
  
  installslib-nolns: LIB
 -	${MKINSTALLDIRS} ${slibdir}
@@ -316,10 +319,9 @@ diff -up Singular-3-1-6/Singular/Makefile.in.destdir Singular-3-1-6/Singular/Mak
 +	  ${INSTALL_PROGRAM}  $$file $(DESTDIR)${libdir}; \
  	done
 -	${INSTALL_PROGRAM} libsingular.h ${includedir}
--	for file in subexpr.h tok.h grammar.h ipid.h lists.h ipshell.h attrib.h silink.h table.h; do \
--	sed -e "s:<kernel/:<singular/:" < $$file |sed -e "s:<Singular/:<singular/:"|sed -e "s:<omalloc/:<:"|sed -e "s:<factory/:<:" >${includedir}/singular/$$file ;\
 +	${INSTALL_PROGRAM} libsingular.h $(DESTDIR)${includedir}
-+	for file in subexpr.h tok.h grammar.h ipid.h lists.h ipshell.h attrib.h silink.h sing_dbm.h table.h; do \
+ 	for file in sing_dbm.h subexpr.h tok.h grammar.h ipid.h lists.h ipshell.h attrib.h silink.h table.h; do \
+-	sed -e "s:<kernel/:<singular/:" < $$file |sed -e "s:<Singular/:<singular/:"|sed -e "s:<omalloc/:<:"|sed -e "s:<factory/:<:" >${includedir}/singular/$$file ;\
 +	sed -e "s:<kernel/:<singular/:" < $$file |sed -e "s:<Singular/:<singular/:"|sed -e "s:<omalloc/:<:"|sed -e "s:<factory/:<:" >$(DESTDIR)${includedir}/singular/$$file ;\
  	done
  
