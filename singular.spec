@@ -212,7 +212,7 @@ touch -r kernel/feResource.cc.orig kernel/feResource.cc
 
 %build
 export CC=gcc
-export CXX=g++
+export CXX="g++ -std=c++98"
 export CFLAGS="%{optflags} -fPIC -fsigned-char -fno-delete-null-pointer-checks -I%{_includedir}/cddlib -I%{_includedir}/flint"
 export CXXFLAGS=$CFLAGS
 export LDFLAGS="$RPM_LD_FLAGS -Wl,--as-needed -L$PWD/gfanlib"
