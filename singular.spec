@@ -20,7 +20,7 @@ Summary:	Computer Algebra System for polynomial computations
 License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/Singular-%{upstreamver}.tar.gz
-URL:		http://www.singular.uni-kl.de/
+URL:		https://www.singular.uni-kl.de/
 BuildRequires:	cddlib-devel
 BuildRequires:	dos2unix
 BuildRequires:	emacs
