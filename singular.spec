@@ -21,6 +21,10 @@ License:	BSD and LGPLv2+ and GPLv2+
 Group:		Sciences/Mathematics
 Source0:	http://www.mathematik.uni-kl.de/ftp/pub/Math/Singular/SOURCES/%{upstreamver}/Singular-%{upstreamver}.tar.gz
 URL:		https://www.singular.uni-kl.de/
+BuildRequires:	autoconf
+BuildRequires:	automake
+BuildRequires:	libtool-base
+BuildRequires:	slibtool
 BuildRequires:	cddlib-devel
 BuildRequires:	dos2unix
 BuildRequires:	emacs
